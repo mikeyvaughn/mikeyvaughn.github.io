@@ -416,3 +416,20 @@ em{font-style:normal}
   .hero-photo figcaption .hero-caption-title{font-size:.8rem;font-weight:500;line-height:1.4}
   .hero-photo figcaption .hero-caption-meta{font-size:.78rem;font-weight:400;line-height:1.4}
 }
+
+/* Campaign cases lead with Mikey’s contribution, then candidate context and outcome. */
+.campaign .campaign-owner{margin:0 0 6px;font-weight:700}
+.campaign p.campaign-role-title{font-size:1.1rem;font-weight:600;line-height:1.45;margin:0 0 20px;max-width:100%}
+.campaign h3{font-size:2.2rem;line-height:1.12;margin-bottom:10px}
+.campaign .campaign-location{font-size:.9rem;margin-bottom:20px;line-height:1.5}
+.campaign-contribution{font-size:1rem;line-height:1.65;margin-bottom:20px}
+.campaign-result{margin-bottom:22px}
+.campaign-result .eyebrow{font-size:.85rem;margin-bottom:6px}
+.campaign-result .campaign-outcome{margin-top:0}
+@media(max-width:760px){
+ .campaign p.campaign-role-title{font-size:1rem;margin-bottom:16px}
+ .campaign h3{font-size:1.9rem;line-height:1.15}
+ .campaign .campaign-location{font-size:.85rem;margin-bottom:16px}
+ .campaign-contribution{margin-bottom:18px}
+ .campaign-result{margin-bottom:14px}
+}
