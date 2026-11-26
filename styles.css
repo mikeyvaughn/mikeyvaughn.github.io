@@ -316,3 +316,17 @@ em{font-style:normal}
   .masthead nav a:hover,.masthead nav a:focus-visible{color:var(--gold)}
   .masthead nav a[aria-current=page]{font-weight:700}
 }
+
+/* Mobile disclosure keeps navigation compact, with a no-script link fallback. */
+.menu-toggle{display:none}
+@media(max-width:760px){
+  .masthead .menu-toggle:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:48px;margin-top:14px;padding:10px 14px;border:1px solid rgba(250,245,233,.45);border-radius:3px;background:transparent;color:var(--paper);font:600 .9rem/1.4 var(--sans);text-align:left;cursor:pointer}
+  .menu-toggle svg{flex:0 0 16px;transition:transform .15s ease}
+  .menu-toggle[aria-expanded=true] svg{transform:rotate(180deg)}
+  .menu-toggle:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+  .masthead nav{grid-template-columns:1fr;gap:0;margin-top:8px;font-size:.9rem}
+  .masthead nav a{min-height:48px;padding:12px 14px}
+  .masthead.menu-ready nav{display:none}
+  .masthead.menu-ready.menu-open nav{display:grid}
+}
+@media(prefers-reduced-motion:reduce){.menu-toggle svg{transition:none}}
