@@ -437,3 +437,45 @@ em{font-style:normal}
 /* Keep candidate outcomes and onward links aligned across the paired case studies. */
 .campaign-result{margin-top:auto}
 .campaign>.text-link{margin-top:0}
+
+/* Refined contact grouping and optical scale for the painted conversation artwork. */
+.footer{padding-block:42px 24px}
+.footer-main{gap:56px;padding-bottom:30px;align-items:center}
+.conversation-heading{gap:24px;align-items:center}
+.conversation-heading h2{font-size:2.3rem;line-height:1.12}
+.conversation-heading img{width:100px;flex-basis:100px}
+.footer-links{width:100%;max-width:370px;gap:0}
+.footer-links a{min-height:54px;padding-block:14px;border-bottom:1px solid rgba(250,245,233,.2)}
+.footer-links a:first-child{border-top:1px solid rgba(250,245,233,.2)}
+.footer-links a span{text-decoration:none}
+.footer-links a:hover span{text-decoration:underline;text-underline-offset:5px}
+.footer-bottom{padding-block:26px 4px;gap:12px}
+.footer-bottom .brand-tagline{font-size:1.25rem;line-height:1.4}
+.photography-credits{margin-top:14px}
+@media(max-width:1000px) and (min-width:761px){
+ .footer-main{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px}
+ .conversation-heading{gap:18px}
+ .conversation-heading h2{font-size:2rem}
+ .conversation-heading img{width:80px;flex-basis:80px}
+}
+@media(max-width:760px){
+ .footer{padding-block:30px 18px}
+ .footer-main{gap:24px;padding-bottom:24px}
+ .footer .eyebrow{margin-bottom:16px}
+ .conversation-heading{gap:16px;justify-content:space-between}
+ .conversation-heading h2{font-size:clamp(1.5rem,6vw,1.8rem);line-height:1.15}
+ .conversation-heading img{width:68px;flex-basis:68px}
+ .footer-links{max-width:none}
+ .footer-links a{min-height:54px;padding-block:14px;gap:12px}
+ .footer-bottom{padding-top:24px;gap:10px}
+ .footer-bottom .brand-logo{width:min(100%,290px)}
+ .footer-bottom .brand-tagline{font-size:1.05rem;line-height:1.4;max-width:30ch}
+ .photography-credits{margin-top:10px}
+}
+@media(max-width:760px){
+ .footer-main>div:first-child{position:relative}
+ .footer-main>div:first-child>.eyebrow{min-height:58px;padding-right:88px;display:flex;align-items:center;margin-bottom:12px}
+ .conversation-heading{display:block}
+ .conversation-heading h2{font-size:clamp(1.6rem,6vw,1.8rem);max-width:none}
+ .conversation-heading img{position:absolute;right:0;top:0;width:68px}
+}
