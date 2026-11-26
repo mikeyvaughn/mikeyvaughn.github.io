@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 88" fill="none"><title>Voices in conversation</title>
-<path d="M10 21C10 11 22 7 40 8c20-1 33 4 35 15 2 13-8 21-28 22l-10-1-18 13 4-17C14 37 9 31 10 21Z" fill="#FAF5E9"/>
-<path d="M47 53c8 1 17-1 24-5 7-5 11-10 12-18 9 5 12 13 9 22-2 7-9 11-19 13l4 15-17-12c-13-1-23-5-26-12" stroke="#FAF5E9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="m25 23 32-1m-30 10 21 1" stroke="#143E38" stroke-width="2.8" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 88" fill="none"><title>Shared voices, abstract painted forms</title>
+<path d="M8 24c1-12 16-18 34-17 20-1 34 6 34 19 0 14-14 21-34 20l-8-1-18 13 4-18C12 37 7 32 8 24Z" fill="#FAF5E9"/>
+<path d="M45 56c19 1 32-5 37-17 9 5 13 12 10 21-3 8-12 13-24 13l-9-1-14 10 2-15c-7-2-12-6-14-11l12 0Z" fill="#FAF5E9" opacity=".72"/>
+<path d="m25 24 32-1m-29 10 21 1" stroke="#143E38" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M14 22c4-9 18-12 32-10 9 0 17 3 21 7-17-5-38-4-53 3Z" fill="#FFFFFF" opacity=".25"/></svg>
