@@ -433,3 +433,7 @@ em{font-style:normal}
  .campaign-contribution{margin-bottom:18px}
  .campaign-result{margin-bottom:14px}
 }
+
+/* Keep candidate outcomes and onward links aligned across the paired case studies. */
+.campaign-result{margin-top:auto}
+.campaign>.text-link{margin-top:0}
