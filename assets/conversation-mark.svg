@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 88" fill="none"><title>A conversation</title><g stroke="#FAF5E9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18c1-7 10-10 25-10h22c12 0 20 5 20 14v16c0 9-8 13-20 13H35L20 64l2-15c-8-2-13-6-13-13Z"/><path d="M39 58c2 8 10 11 20 11h11l13 10-2-13c7-2 10-6 10-13V39c0-7-4-11-10-13"/><path d="m25 25 34-1m-34 12 24 1"/><path d="m69 5 3-4m14 13 6-2" stroke="#F4C44E"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 88" fill="none"><title>Voices in conversation</title>
+<path d="M10 21C10 11 22 7 40 8c20-1 33 4 35 15 2 13-8 21-28 22l-10-1-18 13 4-17C14 37 9 31 10 21Z" fill="#FAF5E9"/>
+<path d="M47 53c8 1 17-1 24-5 7-5 11-10 12-18 9 5 12 13 9 22-2 7-9 11-19 13l4 15-17-12c-13-1-23-5-26-12" stroke="#FAF5E9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="m25 23 32-1m-30 10 21 1" stroke="#143E38" stroke-width="2.8" stroke-linecap="round"/>
+</svg>
