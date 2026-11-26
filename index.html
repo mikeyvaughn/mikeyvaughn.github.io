@@ -16,7 +16,7 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="header-band"><header class="masthead wrap">
     <a class="wordmark brand-logo" href="#home" aria-label="Mikey Vaughn, home"><img src="assets/mikey-vaughn-logo.svg" alt="Mikey Vaughn" width="800" height="140"></a>
-    <nav aria-label="Main navigation">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" hidden><span>Menu</span><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><nav id="primary-navigation" aria-label="Main navigation">
       <a href="union-leadership.html">Labor</a>
       <a href="#work">Advocacy</a>
       <a href="#community">Community</a>
@@ -140,5 +140,34 @@
 </svg><span>Follow on Instagram</span></a><a href="mailto:mikeyvaughn1@gmail.com"><svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg><span>mikeyvaughn1@gmail.com</span></a></div></div><div class="footer-bottom"><a class="wordmark brand-logo" href="#home"><img src="assets/mikey-vaughn-logo.svg" alt="Mikey Vaughn" width="800" height="140"></a><p class="brand-tagline"><span>Empowering communities</span> <span>to shape their own future</span></p></div><details class="photography-credits"><summary>Photography credits</summary><dl><div><dt>Organizing march</dt><dd>Courtesy of SEIU-UHW, via <a href="https://stocktonia.org/news/health/2025/09/06/advocates-fight-for-immigrant-health-care-amid-trump-policy-changes/" target="_blank" rel="noopener noreferrer">Stocktonia</a>.</dd></div><div><dt>Assembly hearing</dt><dd>Aaron Stigile / News21.</dd></div><div><dt>Campaign portraits</dt><dd><a href="https://www.post4weho.com/" target="_blank" rel="noopener noreferrer">Stephen Post</a> and <a href="https://votekanani.com/" target="_blank" rel="noopener noreferrer">Seema Kanani</a> campaigns.</dd></div><div><dt>Interview cover</dt><dd><a href="https://www.instagram.com/mikeyv_costa/reel/Dd2bHWthOSz/" target="_blank" rel="noopener noreferrer">@mikeyv_costa</a>.</dd></div></dl></details></div>
     </footer>
   </main>
+  <script>
+    (() => {
+      const header = document.querySelector('.masthead');
+      const toggle = header.querySelector('.menu-toggle');
+      const nav = header.querySelector('nav');
+      const mobile = window.matchMedia('(max-width: 760px)');
+      const closeMenu = () => {
+        header.classList.remove('menu-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      header.classList.add('menu-ready');
+      toggle.hidden = false;
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        header.classList.toggle('menu-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      nav.addEventListener('click', event => {
+        if (mobile.matches && event.target.closest('a')) closeMenu();
+      });
+      header.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+          closeMenu();
+          toggle.focus();
+        }
+      });
+      mobile.addEventListener('change', closeMenu);
+    })();
+  </script>
 </body>
 </html>
