@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" fill="none"><title>A painted heart above a supporting brushstroke</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" fill="none"><title>A painted heart above a supporting brushstroke</title><defs><filter id="paint-edge" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency=".07 .24" numOctaves="3" seed="12" result="grain"/><feDisplacementMap in="SourceGraphic" in2="grain" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter><mask id="brush-breaks"><rect width="280" height="220" fill="white"/><path d="M88 64l2 10m101-19 3 8M53 158l17 6m126 13 12-4M120 121l6 4" stroke="black" stroke-width="1.3" stroke-linecap="round" opacity=".65"/></mask></defs><g filter="url(#paint-edge)" mask="url(#brush-breaks)">
 <path d="M140 139c-15-10-54-38-58-64-3-21 9-36 27-37 14-2 26 6 32 19 10-16 26-23 42-16 18 7 25 24 18 43-9 25-43 46-61 55Z" fill="#F4C44E"/>
-<path d="M91 73c0-17 13-28 28-25-17 3-22 17-15 33 7 17 22 33 36 46-26-14-49-35-49-54Z" fill="#FAF5E9" opacity=".25"/>
+
 <path d="M43 151c30 12 62 18 97 17 36 0 70-7 98-20-9 20-43 39-97 40-49 0-83-15-98-37Z" fill="#143E38"/>
-<path d="M62 162c24 9 49 13 78 12 29 0 56-4 77-12-20 13-47 19-78 19-31 0-58-7-77-19Z" fill="#FAF5E9" opacity=".13"/>
-</svg>
+
+</g></svg>
