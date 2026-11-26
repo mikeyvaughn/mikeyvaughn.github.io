@@ -474,8 +474,15 @@ em{font-style:normal}
 }
 @media(max-width:760px){
  .footer-main>div:first-child{position:relative}
- .footer-main>div:first-child>.eyebrow{min-height:58px;padding-right:88px;display:flex;align-items:center;margin-bottom:12px}
+ .footer-main>div:first-child:has(.conversation-heading)>.eyebrow{min-height:58px;padding-right:88px;display:flex;align-items:center;margin-bottom:12px}
  .conversation-heading{display:block}
  .conversation-heading h2{font-size:clamp(1.6rem,6vw,1.8rem);max-width:none}
  .conversation-heading img{position:absolute;right:0;top:0;width:68px}
+}
+
+/* Cross-page audit: retain headroom in the wide Labor photo and align source links. */
+@media(min-width:761px){
+ .union-image img{object-position:50% 15%}
+ .public-record article{display:flex;flex-direction:column;align-items:flex-start}
+ .public-record article>.text-link{margin-top:auto}
 }
