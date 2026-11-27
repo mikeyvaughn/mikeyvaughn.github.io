@@ -625,3 +625,38 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
  .union-intro .union-deck{row-gap:16px;margin-top:20px}
  .campaign-heading{row-gap:16px}
 }
+
+/* Tighten section transitions while preserving the established type hierarchy. */
+@media(min-width:761px){
+ .section{padding-block:56px}
+ .statement{padding-block:48px}
+ .community{padding-top:48px}
+ .digital{padding-block:48px}
+ body .about-feature{padding-block:48px}
+ .union-intro{padding-block:48px 36px}
+ .union-image+.union-roles{padding-top:44px}
+ .union-roles{padding-bottom:44px}
+ #member-development{padding-block:44px 32px}
+ #member-development+.section{padding-block:44px 48px}
+}
+.union-record{margin-top:0}
+@media(max-width:760px){
+ .section{padding-block:32px}
+ .union-image+.union-roles{padding-top:28px}
+ .union-roles{padding-bottom:28px}
+ #member-development{padding-block:28px}
+ #member-development+.section{padding-block:28px 32px}
+ body .about-feature{padding-bottom:32px}
+ .union-roles .section-heading{margin-bottom:24px}
+}
+
+/* Let the hero introduction breathe within its existing column. */
+.hero-intro>p:not(.hero-role){max-width:48ch;line-height:1.7}
+@media(min-width:761px){
+ .hero-role{margin-bottom:18px}
+ .hero-intro>p:not(.hero-role){margin-bottom:22px}
+}
+@media(max-width:760px){
+ .hero{row-gap:16px}
+ .hero-intro>p:not(.hero-role){max-width:none;line-height:1.7}
+}
