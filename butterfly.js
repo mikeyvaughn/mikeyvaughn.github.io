@@ -88,8 +88,13 @@
     const b=bounds(scene),landing=allowLanding?landingPoint(scene):null;
     const limit=p=>({x:clamp(p.x,b.left,b.right),y:clamp(p.y,b.top,b.bottom)});
     let chosen=null;
+    if(takingOff)for(const lift of [28,42,56]){
+      const end=limit({x:scene.point.x,y:scene.point.y-lift});
+      const departure={start:{...scene.point},startScale:scene.scale||.72,endScale:scene.scale||.72,end,c1:{x:scene.point.x,y:scene.point.y-lift*.4},c2:{x:end.x,y:end.y+lift*.2},duration:1800+lift*10,perch:false,takeoff:true,cadence:690,rest:0,glideStart:2,glideLength:0,secondGlide:2};
+      if(clearCurve(scene,departure)){chosen=departure;break;}
+    }
     // Plan through clear corridors before flying, avoiding last-second dodges.
-    for(let attempt=0;attempt<100;attempt++){
+    for(let attempt=0;!chosen&&attempt<100;attempt++){
       const perch=!!landing&&attempt<35,end=perch?landing:randomPoint(scene,attempt>=50?(scene.scale||1):1);
       const dx=end.x-scene.point.x,dy=end.y-scene.point.y,distance=Math.hypot(dx,dy)||1,direction={x:dx/distance,y:dy/distance};
       const reach=clamp(distance*.3,14,140),bend=(Math.random()-.5)*Math.min(90,distance*.26);
@@ -148,7 +153,7 @@
     const b=bounds(scene),resting=scene.art.classList.contains('is-perched');
     // Keep the full wing silhouette inside the section, including its gentle bob.
     const x=clamp(scene.point.x,b.left,b.right),y=clamp(scene.point.y+(resting?0:scene.bob),b.top,b.bottom);
-    scene.art.style.transform=`translate3d(${x}px,${y}px,0) rotate(${resting?0:scene.bank}deg)`;
+    scene.art.style.transform=`translate3d(${x}px,${y}px,0) rotate(${resting?0:scene.bank}deg) scale(${scene.scale||1})`;
   }
   function advance(scene,delta){
     if(scene.departAt&&performance.now()>=scene.departAt)nextFlight(scene,false);
@@ -168,7 +173,7 @@
     scene.open+=(opening-scene.open)*Math.min(1,delta/(resting?400:120));
     scene.art.style.setProperty('--wing-open',String(scene.open));scene.art.style.setProperty('--wing-right-open',String(clamp(scene.open+.009*Math.sin(scene.phase+.1)*(1-glide)*landing,.45,.99)));
     scene.bob=resting?0:Math.sin(scene.phase-.6)*(1.45*(1-glide)+.2*glide)*landing;
-    scene.scale=flightScale(f,u);scene.art.style.scale=String(scene.scale);
+    scene.scale=flightScale(f,u);
     scene.art.classList.toggle('is-perched',resting);scene.art.classList.toggle('is-gliding',glide>.5);paint(scene);
     if(scene.elapsed>=f.duration+f.rest)nextFlight(scene);
   }
