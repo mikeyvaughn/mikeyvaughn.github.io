@@ -43,3 +43,12 @@
 
 .about-documentary img{aspect-ratio:auto}
 
+
+/* Running photo carousel preserves the original About photo footprint. */
+.about-documentary.hero-carousel{align-self:start;min-width:0}
+.about-documentary.hero-carousel .hero-carousel-stage{height:auto;aspect-ratio:4/3}
+.about-documentary.hero-carousel .hero-carousel-slide img{width:100%;height:100%;margin:0;object-fit:cover;object-position:center}
+.about-documentary.hero-carousel [data-photo="about-running"] img,
+.about-documentary.hero-carousel [data-photo="about-medals"] img{object-fit:contain}
+.about-documentary .hero-carousel-caption{min-height:62px}
+.about-documentary [data-caption-meta]:empty{display:none}
