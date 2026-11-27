@@ -4,6 +4,7 @@
   const source=template.querySelector('.mfv-butterfly');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const outingDuration=header=>header?19000+Math.random()*7000:45000+Math.random()*15000;
   const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
   let raf=0,previous=0;
   // The decorative effect follows the device's reduced-motion preference.
@@ -33,7 +34,7 @@
       svg.querySelector('defs').append(filter);svg.setAttribute('filter',`url(#${filterId})`);
     }
     art.classList.toggle('on-header',section.classList.contains('header-band'));
-    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),statement:section.classList.contains('statement'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:null,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,outing:0,outingLimit:19000+Math.random()*7000,cooldown:0,fadeOut:0};
+    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),statement:section.classList.contains('statement'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:null,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,outing:0,outingLimit:outingDuration(section.classList.contains('header-band')),cooldown:0,fadeOut:0};
   });
   template.remove();
   function bounds(scene){
@@ -195,7 +196,7 @@
     if(!f.pattern&&f.clock>=f.patternNext){
       f.pattern=Math.random()<.6?loopPattern(scene,f):null;f.patternNext=f.clock+4200+Math.random()*3500;
       if(!f.pattern)f.turnTarget=(Math.random()<.5?-1:1)*(.45+Math.random()*.3);
-      if(f.pattern)scene.outingLimit=Math.min(34000,Math.max(scene.outingLimit||0,(scene.outing||0)+f.pattern.timeout+600));
+      if(f.pattern)scene.outingLimit=Math.min(scene.header?34000:60000,Math.max(scene.outingLimit||0,(scene.outing||0)+f.pattern.timeout+600));
     }
     if(f.pattern){
       const currentAngle=Math.atan2(f.vy,f.vx);
@@ -264,10 +265,10 @@
     const delta=previous?Math.min(time-previous,50):0;previous=time;
     const active=showScene();
     if(active){
-      if(active.cooldown>0){active.cooldown=Math.max(0,active.cooldown-delta);if(active.cooldown===0){active.outing=0;active.outingLimit=19000+Math.random()*7000;entrance(active);}}
+      if(active.cooldown>0){active.cooldown=Math.max(0,active.cooldown-delta);if(active.cooldown===0){active.outing=0;active.outingLimit=outingDuration(active.header);entrance(active);}}
       else{
         advance(active,delta);active.outing+=delta;
-        if(active.fadeOut>0){active.fadeOut-=delta;if(active.fadeOut<=0)active.cooldown=7000+Math.random()*6000;}
+        if(active.fadeOut>0){active.fadeOut-=delta;if(active.fadeOut<=0)active.cooldown=active.header?7000+Math.random()*6000:4000+Math.random()*3000;}
         else if(active.outing>active.outingLimit)active.fadeOut=1400;
       }
     }
