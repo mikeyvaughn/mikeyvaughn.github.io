@@ -533,3 +533,44 @@ em{font-style:normal}
  body{overflow-wrap:anywhere}
  .role-list>div{grid-template-columns:minmax(55px,max-content) minmax(0,1fr)}
 }
+
+/* Cross-page finishing pass: shared gutters, connected actions and balanced biography. */
+.statement-copy>.text-link{margin-top:20px}
+.section-heading .section-kicker{margin-bottom:18px}
+.community-stories article:last-child{padding-bottom:0}
+.digital-article-grid .digital-story,
+.digital-article-grid .digital-training{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.digital-article-grid .story-action,
+.digital-article-grid .digital-training>.text-link{margin-top:auto;min-height:44px;display:inline-flex;align-items:center;padding-top:14px;padding-bottom:6px}
+.digital-article-grid h3{max-width:100%}
+body .about-personal-details{display:grid;grid-template-columns:1.1fr 1fr;gap:54px;border-top:1px solid var(--line);margin-top:30px;padding-top:24px}
+body .about-personal-details p{font-size:1rem;line-height:1.65;margin:0;max-width:53ch}
+body .about-prose>p:last-of-type{margin-bottom:16px}
+@media(min-width:1001px){
+ .statement-grid,.community-layout,.about-layout,.union-deck,.union-role-grid{column-gap:48px}
+ body .about-profile,body .about-personal-details{column-gap:48px}
+ body .about-story-layout{column-gap:48px}
+ .digital-article-grid{column-gap:32px}
+}
+@media(min-width:761px){
+ .union-org{grid-template-columns:180px minmax(0,1fr);gap:40px;padding-block:24px}
+ .digital-article-grid h3{min-height:2.24em}
+ body .about-profile{align-items:start}
+}
+@media(min-width:761px) and (max-width:1000px){
+ body .about-personal-details{gap:32px}
+ .digital-article-grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:30px}
+ .digital-article-grid .digital-training{grid-column:1/-1;max-width:66ch}
+ .digital-article-grid .digital-training>p:not(.eyebrow){max-width:64ch}
+ .digital-article-grid .digital-training>.text-link{margin-top:18px}
+}
+@media(max-width:760px){
+ .statement-copy>.text-link{margin-top:16px}
+ .section-heading .section-kicker{margin-bottom:14px}
+ .digital-article-grid .story-action,
+ .digital-article-grid .digital-training>.text-link{margin-top:14px;padding-top:8px;padding-bottom:6px}
+ .digital-article-grid h3{min-height:0}
+ body .about-personal-details{grid-template-columns:minmax(0,1fr);gap:18px;margin-top:24px;padding-top:22px}
+ body .about-personal-details p{max-width:none}
+ body .about-personal-details .about-personal{padding:0;margin:0;border:0}
+}
