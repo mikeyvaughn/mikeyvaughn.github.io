@@ -21,3 +21,7 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 
 .mfv-butterfly .hindwing{transform-origin:100px 84px;transform:rotate(var(--hindwing-lag,0deg))}
 .mfv-butterfly .wing-right .hindwing{transform:rotate(calc(-1 * var(--hindwing-lag,0deg)))}
+
+/* Footer butterfly occludes divider lines through its alpha silhouette, not a rectangle. */
+.footer .mfv-butterfly-surface{z-index:2}
+.footer .mfv-butterfly.is-visible{opacity:1}

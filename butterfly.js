@@ -17,6 +17,21 @@
       art.querySelectorAll(`[href="#${old}"]`).forEach(use=>use.setAttribute('href',`#${next}`));
       art.querySelectorAll('[clip-path]').forEach(use=>{if(use.getAttribute('clip-path')===`url(#${old})`)use.setAttribute('clip-path',`url(#${next})`);});
     });
+    if(section.classList.contains('footer')){
+      // Keep the subtle cream rendering, but occlude the divider beneath the silhouette.
+      const svg=art.querySelector('svg'),ns='http://www.w3.org/2000/svg';
+      const filter=document.createElementNS(ns,'filter');
+      const filterId=`mfv-${index}-footer-foreground`;
+      filter.setAttribute('id',filterId);
+      filter.setAttribute('color-interpolation-filters','sRGB');
+      filter.setAttribute('x','-25%');filter.setAttribute('y','-25%');
+      filter.setAttribute('width','150%');filter.setAttribute('height','150%');
+      filter.innerHTML=`<feFlood flood-color="${getComputedStyle(section).backgroundColor}" result="green"/>
+        <feComposite in="green" in2="SourceAlpha" operator="in" result="silhouette"/>
+        <feComponentTransfer in="SourceGraphic" result="soft-art"><feFuncA type="linear" slope="0.34"/></feComponentTransfer>
+        <feComposite in="soft-art" in2="silhouette" operator="atop"/>`;
+      svg.querySelector('defs').append(filter);svg.setAttribute('filter',`url(#${filterId})`);
+    }
     art.classList.toggle('on-header',section.classList.contains('header-band'));
     return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),statement:section.classList.contains('statement'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:null,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,outing:0,outingLimit:19000+Math.random()*7000,cooldown:0,fadeOut:0};
   });
