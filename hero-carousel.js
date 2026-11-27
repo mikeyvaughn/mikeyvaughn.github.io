@@ -10,7 +10,7 @@
   const caption = carousel.querySelector('.hero-carousel-caption');
   const position = carousel.querySelector('[data-position]');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const interval = 4000;
+  const interval = 3000;
   let current = 0;
   let userPaused = reducedMotion.matches;
   let hovered = false;
@@ -76,7 +76,9 @@
     if (event.pointerType === 'mouse') { hovered = false; schedule(); }
   });
   carousel.addEventListener('focusin', event => {
-    if (event.target !== playButton) { userPaused = true; updatePlayback(); schedule(); }
+    if (event.target !== playButton && event.target.matches(':focus-visible')) {
+      userPaused = true; updatePlayback(); schedule();
+    }
   });
   stage.addEventListener('keydown', event => {
     if (event.target !== stage) return;
@@ -88,10 +90,9 @@
   });
   stage.addEventListener('pointerdown', event => {
     if (event.target.closest('button')) return;
+    // A touch may start a vertical page scroll. Pause only after a confirmed
+    // horizontal swipe, explicit control action, or keyboard interaction.
     pointerStart = { x: event.clientX, y: event.clientY };
-    userPaused = true;
-    updatePlayback();
-    schedule();
   });
   stage.addEventListener('pointerup', event => {
     if (!pointerStart) return;
