@@ -592,3 +592,12 @@ body .about-prose>p:last-of-type{margin-bottom:16px}
  .conversation-heading{grid-template-columns:minmax(0,1fr) 72px;gap:12px}
  .conversation-heading img{width:72px}
 }
+
+/* Optical placement follows the gap after the first heading line, not a wrapped block. */
+@media(min-width:761px){.conversation-heading img{transform:translateY(-8px)}}
+@media(max-width:760px){
+ .conversation-heading{--conversation-type-size:clamp(1.6rem,6vw,1.8rem);--conversation-art-size:84px}
+ .conversation-heading h2{font-size:var(--conversation-type-size)}
+ .conversation-heading img{align-self:start;margin-top:calc(var(--conversation-type-size) * 1.15 - var(--conversation-art-size) * .375 - 6px);transform:none}
+}
+@media(max-width:380px){.conversation-heading{--conversation-art-size:72px}}
