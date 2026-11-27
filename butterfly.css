@@ -5,11 +5,6 @@
 .mfv-butterfly .wing-left,.mfv-butterfly .wing-right{transform-origin:100px 84px;transform:scaleX(var(--wing-open,.98))}
 .mfv-butterfly .wing-right{transform:scaleX(var(--wing-right-open,.98))}
 @media(max-width:760px){.mfv-butterfly{width:clamp(90px,26vw,118px);height:auto}}
-.butterfly-controls{margin-top:8px}
-.butterfly-controls[hidden]{display:none}
-.butterfly-controls button{min-height:44px;padding:8px 0;border:0;border-bottom:1px solid rgba(250,245,233,.4);background:none;color:var(--paper);font:500 .78rem/1.4 var(--sans);cursor:pointer}
-.butterfly-controls button:hover{text-decoration:underline;text-underline-offset:4px}
-.butterfly-controls button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.mfv-butterfly{display:none}}
 
@@ -22,3 +17,5 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 
 /* Decorative layers scroll naturally with their own evergreen section. */
 :where(.header-band,.statement,.digital,.footer){position:relative}
+
+@media(max-width:760px){.header-band .mfv-butterfly-surface{display:none}}

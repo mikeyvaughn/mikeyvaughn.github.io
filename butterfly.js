@@ -1,35 +1,33 @@
 (() => {
   const template=document.querySelector('.mfv-butterfly-surface');
-  const controls=document.querySelector('.butterfly-controls');
-  if(!template||!controls)return;
-  const source=template.querySelector('.mfv-butterfly'),toggle=controls.querySelector('[data-butterfly-toggle]');
+  if(!template)return;
+  const source=template.querySelector('.mfv-butterfly');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
-  let preference=false;
-  try{preference=sessionStorage.getItem('mfv-butterfly-paused')==='true';}catch{}
-  let paused=preference||reduced.matches,raf=0,previous=0,disposed=false;
-  controls.hidden=reduced.matches;
+  let raf=0,previous=0;
+  // The decorative effect follows the device's reduced-motion preference.
+  try{sessionStorage.removeItem('mfv-butterfly-paused');}catch{}
   // Each green section owns its artwork and route in local section coordinates.
   const scenes=[...document.querySelectorAll('.header-band,.statement,.digital,.footer')].map((section,index)=>{
     const layer=document.createElement('div');layer.className='mfv-butterfly-surface';layer.setAttribute('aria-hidden','true');
     const art=source.cloneNode(true);layer.append(art);section.append(layer);
     art.querySelectorAll('[id]').forEach(node=>{const old=node.id,next=`mfv-${index}-${old}`;node.id=next;art.querySelectorAll(`[href="#${old}"]`).forEach(use=>use.setAttribute('href',`#${next}`));});
     art.classList.toggle('on-header',section.classList.contains('header-band'));
-    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:0,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,footerFlights:0,departAt:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,perchScale:.72};
+    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:0,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,footerFlights:0,departAt:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,perchScale:.72};
   });
   template.remove();
   const finePointer=matchMedia('(hover: hover) and (pointer: fine)');
   scenes.forEach(scene=>{
     scene.section.addEventListener('pointermove',event=>{
-      if(paused||reduced.matches||!finePointer.matches||!scene.art.classList.contains('is-perched'))return;
+      if(reduced.matches||!finePointer.matches||!scene.art.classList.contains('is-perched'))return;
       const rect=scene.art.getBoundingClientRect(),distance=Math.hypot(event.clientX-(rect.left+rect.width*.5),event.clientY-(rect.top+rect.height*.68));
       if(distance<Math.max(54,rect.width*.65)&&!scene.departAt)scene.departAt=performance.now()+650;
     },{passive:true});
     scene.section.addEventListener('pointerleave',()=>{if(scene.departAt)scene.departAt=0;});
   });
   function bounds(scene){
-    return{left:8,right:Math.max(9,scene.width-scene.art.offsetWidth-8),top:6,bottom:Math.max(7,scene.height-scene.art.offsetHeight-6)};
+    return{left:8,right:Math.max(9,scene.width-scene.art.offsetWidth-8),top:6,bottom:Math.max(7,(scene.zoneHeight||scene.height)-scene.art.offsetHeight-6)};
   }
   function footprint(scene,p,padding=8,scale=1){
     const w=scene.art.offsetWidth,h=scene.art.offsetHeight;
@@ -105,6 +103,14 @@
     const firstFlight=!scene.point;
     scene.width=width;scene.height=height;
     if(!scene.header)scene.art.style.width='';
+    scene.zoneHeight=height;
+    if(scene.digital){
+      // Keep this tall section's route near its introduction, rather than below it.
+      const root=scene.section.getBoundingClientRect();
+      const paragraph=scene.section.querySelector('.digital-intro>p:not(.eyebrow)');
+      scene.zoneHeight=width<760&&paragraph?paragraph.getBoundingClientRect().top-root.top:Math.min(height,600);
+      if(width<760)scene.art.style.width='80px';
+    }
     measureContent(scene);
     if(!scene.header){
       let attempts=0;while(!scene.safe&&scene.art.offsetWidth>58&&attempts++<3){scene.art.style.width=`${Math.max(56,scene.art.offsetWidth*.8)}px`;measureContent(scene);}
@@ -115,7 +121,7 @@
   }
   function showScene(){
     // Visibility selects one scene. It never rebases any flight coordinates.
-    const ranked=scenes.map(scene=>{const r=scene.section.getBoundingClientRect();return{scene,visible:Math.max(0,Math.min(innerHeight,r.bottom)-Math.max(0,r.top))};}).filter(row=>row.visible>40&&row.scene.safe);
+    const ranked=scenes.map(scene=>{const r=scene.section.getBoundingClientRect();return{scene,visible:Math.max(0,Math.min(innerHeight,r.bottom)-Math.max(0,r.top))};}).filter(row=>row.visible>40&&row.scene.safe&&!(row.scene.header&&innerWidth<=760));
     ranked.sort((a,b)=>scrollY<100&&a.scene.header!==b.scene.header?(a.scene.header?-1:1):b.visible-a.visible);
     const active=ranked[0]?.scene;
     scenes.forEach(scene=>scene.art.classList.toggle('is-visible',scene===active&&!reduced.matches));
@@ -152,19 +158,16 @@
     raf=requestAnimationFrame(frame);
   }
   function update(){
-    if(disposed)return;
-    cancelAnimationFrame(raf);previous=0;controls.hidden=reduced.matches;
+    cancelAnimationFrame(raf);previous=0;
     scenes.forEach(scene=>{scene.art.hidden=reduced.matches;paint(scene);});
-    toggle.textContent=reduced.matches?'Motion Reduced':paused?'Play Butterfly':'Pause Butterfly';toggle.disabled=reduced.matches;toggle.setAttribute('aria-pressed',String(!paused&&!reduced.matches));showScene();
-    if(!paused&&!reduced.matches&&!document.hidden)raf=requestAnimationFrame(frame);
+    showScene();
+    if(!reduced.matches&&!document.hidden)raf=requestAnimationFrame(frame);
   }
-  document.fonts?.ready.then(()=>{if(!disposed)scenes.forEach(scene=>{scene.width=0;sizeScene(scene);if(scene.footer){scene.footerFlights=0;nextFlight(scene,true);}paint(scene);});});
+  document.fonts?.ready.then(()=>{scenes.forEach(scene=>{scene.width=0;sizeScene(scene);if(scene.footer){scene.footerFlights=0;nextFlight(scene,true);}paint(scene);});});
   const resizeObserver=new ResizeObserver(entries=>{for(const entry of entries){const scene=scenes.find(s=>s.section===entry.target);if(scene){sizeScene(scene);paint(scene);}}});
   scenes.forEach(scene=>{sizeScene(scene);paint(scene);resizeObserver.observe(scene.section);});
-  toggle.addEventListener('click',()=>{paused=!paused;preference=paused;try{sessionStorage.setItem('mfv-butterfly-paused',String(paused));}catch{}update();});
-  controls.querySelector('[data-butterfly-hide]')?.addEventListener('click',()=>{disposed=true;cancelAnimationFrame(raf);resizeObserver.disconnect();scenes.forEach(s=>s.layer.remove());controls.remove();});
-  reduced.addEventListener('change',()=>{paused=preference||reduced.matches;update();});document.addEventListener('visibilitychange',update);
-  addEventListener('scroll',()=>{if(paused&&!disposed)showScene();},{passive:true});
-  addEventListener('resize',()=>{if(!disposed){scenes.forEach(s=>{sizeScene(s);paint(s);});showScene();}});
+  reduced.addEventListener('change',update);document.addEventListener('visibilitychange',update);
+  addEventListener('scroll',()=>{if(reduced.matches)showScene();},{passive:true});
+  addEventListener('resize',()=>{scenes.forEach(s=>{sizeScene(s);paint(s);});showScene();});
   update();
 })();
