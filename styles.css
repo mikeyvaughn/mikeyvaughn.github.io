@@ -491,3 +491,18 @@ em{font-style:normal}
 .campaign-result .campaign-outcome{display:inline-block;background:none;padding:3px 0;color:var(--pine);font-family:var(--serif);font-size:1.4rem;font-weight:500;line-height:1.25;letter-spacing:-.01em;min-height:44px}
 .campaign-result .eyebrow{font-weight:600;letter-spacing:0;margin-bottom:2px}
 @media(max-width:760px){.campaign-result .campaign-outcome{font-size:1.25rem}}
+
+/* Center the identity independently of the compact mobile navigation trigger. */
+@media(max-width:760px){
+ html{scroll-padding-top:82px}
+ .masthead{grid-template-columns:48px minmax(0,1fr) 48px;column-gap:6px;padding-block:8px}
+ .masthead .wordmark.brand-logo{grid-column:2;grid-row:1;justify-self:center;width:100%;max-width:228px;min-height:48px;display:flex;align-items:center}
+ .masthead .menu-toggle:not([hidden]){grid-column:3;grid-row:1;width:48px;height:48px;min-height:48px;padding:0;justify-content:center;border-color:rgba(250,245,233,.3);border-radius:4px}
+ .menu-toggle>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+ .menu-toggle svg{width:22px;height:22px;flex-basis:22px;transform:none!important;transition:none}
+ .menu-toggle .menu-close{display:none}
+ .menu-toggle[aria-expanded=true] .menu-bars{display:none}
+ .menu-toggle[aria-expanded=true] .menu-close{display:block}
+ .masthead nav{grid-column:1/-1;max-height:calc(100svh - 88px);margin-top:4px;padding-bottom:4px}
+ .masthead nav a{padding:12px 8px;min-height:48px}
+}
