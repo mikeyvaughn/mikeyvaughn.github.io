@@ -510,3 +510,25 @@ em{font-style:normal}
 /* Optical centering uses the name's bounds in the approved v11 SVG,
    excluding the whistle and gold period: x=152..743.47 in an 800-unit viewBox. */
 @media(max-width:760px){.masthead .wordmark.brand-logo img{transform:translateX(-5.97%)}}
+
+/* Compact mobile hero lines scale with both viewport and user text size.
+   Natural wrapping remains available: no nowrap or fixed-height text boxes. */
+@media(max-width:760px){
+ .hero h1{font-size:clamp(2.4rem,calc(.85rem + 8.5vw),4rem);line-height:1.08;text-wrap:wrap}
+ .hero h1>span{display:inline;margin:0;letter-spacing:inherit}
+ .hero-role{font-size:clamp(.78rem,calc(.25rem + 2.7vw),1rem);line-height:1.5;text-wrap:wrap;white-space:normal}
+ .hero .hero-tagline,.footer-bottom .brand-tagline{font-size:clamp(.77rem,calc(.12rem + 3.15vw),1.35rem);line-height:1.4;text-wrap:wrap;max-width:none;width:100%;letter-spacing:-.025em}
+ .hero .hero-tagline>span{display:inline}
+}
+
+@media(max-width:760px){
+ .campaign-heading{grid-template-columns:minmax(0,1fr)}
+ .section-heading>*{min-width:0}
+ .section-heading h2,.union-intro h1,.footer h2{overflow-wrap:anywhere}
+ .footer-links a span{min-width:0;overflow-wrap:anywhere}
+}
+
+@media(max-width:760px){
+ body{overflow-wrap:anywhere}
+ .role-list>div{grid-template-columns:minmax(55px,max-content) minmax(0,1fr)}
+}
