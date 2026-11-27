@@ -22,6 +22,7 @@
 #home .hero-carousel-slide[data-photo="6"] img{filter:brightness(1.085) contrast(1.11) saturate(1.2)}
 #home .hero-carousel-slide[data-photo="7"] img{object-position:25% 50%;filter:brightness(1.06) contrast(1.08) saturate(1.15)}
 #home .hero-carousel-slide[data-photo="8"] img{object-position:50% 45%;filter:brightness(1.095) contrast(1.08) saturate(1.18)}
+#home .hero-carousel-slide[data-photo="9"] img{object-position:50% 8%}
 .hero-carousel-caption{padding-top:12px;min-height:62px;line-height:1.45}
 .hero-carousel-caption strong{display:block;font-size:.85rem;font-weight:600}
 .hero-carousel-caption span{display:block;font-size:.78rem;margin-top:3px}
