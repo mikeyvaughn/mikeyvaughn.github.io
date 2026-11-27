@@ -7,23 +7,23 @@
 .hero-carousel .hero-carousel-slide img{width:100%;height:100%;object-fit:cover;object-position:center;aspect-ratio:auto}
 /* Restrained portrait breathing room and full-frame landscape crops.
    The approved lead photo retains its original framing and color. */
-#home .hero-carousel-slide[data-photo="1"] img,
-#home .hero-carousel-slide[data-photo="4"] img{width:94%;margin-inline:auto}
-#home .hero-carousel-slide[data-photo="2"] img,
-#home .hero-carousel-slide[data-photo="8"] img{width:88%;margin-inline:auto}
-#home .hero-carousel-slide[data-photo="3"] img,
-#home .hero-carousel-slide[data-photo="5"] img,
-#home .hero-carousel-slide[data-photo="6"] img,
-#home .hero-carousel-slide[data-photo="7"] img{object-fit:cover}
-#home .hero-carousel-slide[data-photo="1"] img{object-position:50% 44%}
-#home .hero-carousel-slide[data-photo="3"] img{object-position:30% 46%}
-#home .hero-carousel-slide[data-photo="2"] img{object-position:50% 25%;filter:brightness(1.045) contrast(1.035) saturate(1.07)}
-#home .hero-carousel-slide[data-photo="4"] img{object-position:50% 40%;filter:brightness(1.045) contrast(1.025) saturate(1.06)}
-#home .hero-carousel-slide[data-photo="5"] img{filter:brightness(1.07) contrast(1.04) saturate(1.09)}
-#home .hero-carousel-slide[data-photo="6"] img{filter:brightness(1.085) contrast(1.11) saturate(1.2)}
-#home .hero-carousel-slide[data-photo="7"] img{position:absolute;inset:0;margin:auto;width:100%;height:90%;object-position:30% 50%;filter:brightness(1.06) contrast(1.08) saturate(1.15)}
-#home .hero-carousel-slide[data-photo="8"] img{object-position:50% 45%;filter:brightness(1.095) contrast(1.08) saturate(1.18)}
-#home .hero-carousel-slide[data-photo="9"] img{width:90%;margin-inline:auto;object-position:50% 0%}
+#home.hero .hero-carousel-slide[data-photo="1"] img,
+#home.hero .hero-carousel-slide[data-photo="4"] img{width:94%;margin-inline:auto}
+#home.hero .hero-carousel-slide[data-photo="2"] img,
+#home.hero .hero-carousel-slide[data-photo="8"] img{width:88%;margin-inline:auto}
+#home.hero .hero-carousel-slide[data-photo="3"] img,
+#home.hero .hero-carousel-slide[data-photo="5"] img,
+#home.hero .hero-carousel-slide[data-photo="6"] img,
+#home.hero .hero-carousel-slide[data-photo="7"] img{object-fit:cover}
+#home.hero .hero-carousel-slide[data-photo="1"] img{object-position:50% 44%}
+#home.hero .hero-carousel-slide[data-photo="3"] img{object-position:30% 46%}
+#home.hero .hero-carousel-slide[data-photo="2"] img{object-position:50% 25%;filter:brightness(1.045) contrast(1.035) saturate(1.07)}
+#home.hero .hero-carousel-slide[data-photo="4"] img{object-position:50% 40%;filter:brightness(1.045) contrast(1.025) saturate(1.06)}
+#home.hero .hero-carousel-slide[data-photo="5"] img{filter:brightness(1.07) contrast(1.04) saturate(1.09)}
+#home.hero .hero-carousel-slide[data-photo="6"] img{filter:brightness(1.085) contrast(1.11) saturate(1.2)}
+#home.hero .hero-carousel-slide[data-photo="7"] img{position:absolute;inset:0;margin:auto;width:100%;height:90%;object-position:30% 50%;filter:brightness(1.06) contrast(1.08) saturate(1.15)}
+#home.hero .hero-carousel-slide[data-photo="8"] img{object-position:50% 45%;filter:brightness(1.095) contrast(1.08) saturate(1.18)}
+#home.hero .hero-carousel-slide[data-photo="9"] img{width:90%;margin-inline:auto;object-position:50% 0%}
 .hero-carousel-caption{padding-top:12px;min-height:62px;line-height:1.45}
 .hero-carousel-caption strong{display:block;font-size:.85rem;font-weight:600}
 .hero-carousel-caption span{display:block;font-size:.78rem;margin-top:3px}
@@ -48,7 +48,7 @@
 @media(prefers-reduced-motion:reduce){.hero-carousel-slide{transition:none}}
 
 /* At tablet widths the narrow desktop column prioritizes Mikey in the hearing crop. */
-@media(min-width:761px) and (max-width:1000px){#home .hero-carousel-slide[data-photo="7"] img{object-position:54% 50%}}
+@media(min-width:761px) and (max-width:1000px){#home.hero .hero-carousel-slide[data-photo="7"] img{object-position:54% 50%}}
 
 /* Fill the main gallery frame without narrow side borders. */
-#home .hero-carousel-stage .hero-carousel-slide img{width:100%;height:100%;margin:0;object-fit:cover}
+#home.hero .hero-carousel-stage .hero-carousel-slide img{width:100%;height:100%;margin:0;object-fit:cover}
