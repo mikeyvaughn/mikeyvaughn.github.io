@@ -16,6 +16,7 @@
 #home .hero-carousel-slide[data-photo="6"] img,
 #home .hero-carousel-slide[data-photo="7"] img{object-fit:cover}
 #home .hero-carousel-slide[data-photo="1"] img{object-position:50% 44%}
+#home .hero-carousel-slide[data-photo="3"] img{object-position:30% 46%}
 #home .hero-carousel-slide[data-photo="2"] img{object-position:50% 25%;filter:brightness(1.045) contrast(1.035) saturate(1.07)}
 #home .hero-carousel-slide[data-photo="4"] img{object-position:50% 40%;filter:brightness(1.045) contrast(1.025) saturate(1.06)}
 #home .hero-carousel-slide[data-photo="5"] img{filter:brightness(1.07) contrast(1.04) saturate(1.09)}
