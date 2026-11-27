@@ -506,3 +506,7 @@ em{font-style:normal}
  .masthead nav{grid-column:1/-1;max-height:calc(100svh - 88px);margin-top:4px;padding-bottom:4px}
  .masthead nav a{padding:12px 8px;min-height:48px}
 }
+
+/* Optical centering uses the name's bounds in the approved v11 SVG,
+   excluding the whistle and gold period: x=152..743.47 in an 800-unit viewBox. */
+@media(max-width:760px){.masthead .wordmark.brand-logo img{transform:translateX(-5.97%)}}
