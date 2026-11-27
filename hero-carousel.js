@@ -79,6 +79,7 @@
     if (event.target !== playButton) { userPaused = true; updatePlayback(); schedule(); }
   });
   stage.addEventListener('keydown', event => {
+    if (event.target !== stage) return;
     if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
       const target = event.key === 'Home' ? 0 : event.key === 'End' ? slides.length - 1 : current + (event.key === 'ArrowRight' ? 1 : -1);
@@ -86,6 +87,7 @@
     }
   });
   stage.addEventListener('pointerdown', event => {
+    if (event.target.closest('button')) return;
     pointerStart = { x: event.clientX, y: event.clientY };
     userPaused = true;
     updatePlayback();
