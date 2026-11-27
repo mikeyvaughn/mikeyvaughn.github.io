@@ -672,3 +672,12 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
 
 /* WFP original orange, scoped to its Digital Organizing logo only. */
 #digital .wfp-logo{background:#f3563c;padding:16px 18px}
+
+/* Consistent home route, separate from the in-page Back to top control. */
+.footer-utilities{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 24px;margin-top:22px}
+.footer-utilities .photography-credits{margin-top:0}
+.return-home{display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:10px 15px;border:1px solid rgba(250,245,233,.5);border-radius:4px;color:var(--paper);font:600 .85rem/1.3 var(--sans);text-decoration:none}
+.return-home svg{width:19px;height:19px;flex:none}
+.return-home:hover{background:var(--paper);color:var(--pine)}
+.return-home:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+@media(max-width:760px){.footer-utilities{align-items:flex-start;flex-direction:column;gap:8px;margin-top:20px}.return-home{min-height:48px}}

@@ -60,42 +60,45 @@
     if(!points.length)return{x:bounds(scene).left,y:bounds(scene).top};
     return{...points[Math.floor(Math.random()*points.length)]};
   }
-  function curvePoint(f,u){const v=1-u;return{x:v*v*v*f.start.x+3*v*v*u*f.c1.x+3*v*u*u*f.c2.x+u*u*u*f.end.x,y:v*v*v*f.start.y+3*v*v*u*f.c1.y+3*v*u*u*f.c2.y+u*u*u*f.end.y};}
-  function flightScale(f,u){return f.startScale+((f.endScale??1)-f.startScale)*smooth((u-.4)/.35);}
-  function clearCurve(scene,f){
-    const length=Math.hypot(f.c1.x-f.start.x,f.c1.y-f.start.y)+Math.hypot(f.c2.x-f.c1.x,f.c2.y-f.c1.y)+Math.hypot(f.end.x-f.c2.x,f.end.y-f.c2.y);
-    const steps=Math.max(24,Math.min(180,Math.ceil(length/7)));
-    for(let i=0;i<=steps;i++)if(!clearPoint(scene,curvePoint(f,i/steps),8,flightScale(f,i/steps)))return false;
-    return true;
+  const angleDifference=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
+  function clearPosition(scene,p){
+    const b=bounds(scene);
+    return p.x>=b.left&&p.x<=b.right&&p.y>=b.top&&p.y<=b.bottom&&clearPoint(scene,p);
+  }
+  function clearDistance(scene,angle,range){
+    const dx=Math.cos(angle),dy=Math.sin(angle);let clear=0;
+    for(let i=1;i<=12;i++){
+      const distance=range*i/12;
+      if(!clearPosition(scene,{x:scene.point.x+dx*distance,y:scene.point.y+dy*distance}))break;
+      clear=distance;
+    }
+    return clear;
   }
   function nextFlight(scene){
-    const b=bounds(scene),limit=p=>({x:clamp(p.x,b.left,b.right),y:clamp(p.y,b.top,b.bottom)});
-    let chosen=null;
-    // Free flight only. No footer perch, stationary rest or text target.
-    for(let attempt=0;attempt<100;attempt++){
-      const end=randomPoint(scene),dx=end.x-scene.point.x,dy=end.y-scene.point.y;
-      const distance=Math.hypot(dx,dy)||1,direction={x:dx/distance,y:dy/distance};
-      if(attempt<75&&(distance<Math.min(65,scene.width*.1)||direction.x*scene.heading.x+direction.y*scene.heading.y<-.25))continue;
-      const reach=clamp(distance*.3,14,140),bend=(Math.random()-.5)*Math.min(90,distance*.26);
-      const f={start:{...scene.point},startScale:scene.scale||1,endScale:1,end,
-        c1:limit({x:scene.point.x+scene.heading.x*reach,y:scene.point.y+scene.heading.y*reach}),
-        c2:limit({x:end.x-direction.x*reach-direction.y*bend,y:end.y-direction.y*reach+direction.x*bend}),
-        duration:clamp(distance/(28+Math.random()*9)*1000,1800,20000),perch:false,takeoff:false,cadence:125+Math.random()*28,burst:650+Math.random()*450,coast:280+Math.random()*380,rest:0,
-        glideStart:.22+Math.random()*.16,glideLength:.08+Math.random()*.07,secondGlide:.65+Math.random()*.12};
-      if(clearCurve(scene,f)){chosen=f;break;}
+    // Free steering and velocity, not an endpoint or a pre-drawn curve.
+    let angle=Math.atan2(scene.heading.y,scene.heading.x),room=-1;
+    for(let i=0;i<16;i++){
+      const candidate=i*Math.PI/8,clear=clearDistance(scene,candidate,85);
+      const score=clear+Math.random()*12;
+      if(score>room){room=score;angle=candidate;}
     }
-    if(!chosen)scene.fadeOut=1200;
-    scene.flight=chosen||{start:{...scene.point},startScale:1,endScale:1,end:{...scene.point},c1:{...scene.point},c2:{...scene.point},duration:3500,perch:false,takeoff:false,rest:0,glideStart:.15,glideLength:.6};scene.elapsed=0;
+    const speed=22+Math.random()*12;
+    scene.flight={vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+      turn:0,turnTarget:(Math.random()-.5)*1.1,steerTime:0,steerLimit:1400+Math.random()*1800,
+      speed,speedTarget:speed,windX:0,windY:0,windTargetX:0,windTargetY:0,
+      cadence:300+Math.random()*70,burst:900+Math.random()*650,coast:850+Math.random()*850,
+      clock:Math.random()*500,blocked:0};scene.elapsed=0;
+    scene.heading={x:Math.cos(angle),y:Math.sin(angle)};
   }
   function entrance(scene){
     // Reposition only while invisible, never in response to scrolling.
     scene.scale=1;scene.point=randomPoint(scene);scene.art.classList.remove('is-perched');
     nextFlight(scene);
-    const f=scene.flight;scene.bank=Math.atan2(f.c1.y-f.start.y,f.c1.x-f.start.x)*180/Math.PI+90;paint(scene);
+    scene.bank=Math.atan2(scene.flight.vy,scene.flight.vx)*180/Math.PI+90;paint(scene);
   }
   function sizeScene(scene){
     const width=scene.section.clientWidth,height=scene.section.clientHeight;
-    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<760?44:natural,Math.max(42,height-18))}px`;}
+    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<760?44:64,Math.max(42,height-18))}px`;}
     if(width===scene.width&&height===scene.height&&scene.point)return;
     const firstFlight=!scene.point;
     scene.width=width;scene.height=height;
@@ -132,38 +135,59 @@
     scene.art.style.transform=`translate3d(${x}px,${y}px,0) rotate(${scene.bank||0}deg) scale(${scene.scale||1})`;
   }
   function advance(scene,delta){
-    const f=scene.flight;
-    // Brief powered bursts and variable coasting replace the slow metronomic pulse.
-    const burst=f.burst||850,coast=f.coast||420,cycle=burst+coast;
-    const cycleTime=scene.outing%cycle;
-    const glide=smooth((cycleTime-burst)/100)*(1-smooth((cycleTime-cycle+110)/110));
-    scene.phase+=delta/(f.cadence||140)*Math.PI*2*(1-glide);
-    scene.elapsed+=delta;
-    const progress=Math.min(scene.elapsed/f.duration,1),u=progress,v=1-u;
-    scene.point=curvePoint(f,u);
-    const vx=3*v*v*(f.c1.x-f.start.x)+6*v*u*(f.c2.x-f.c1.x)+3*u*u*(f.end.x-f.c2.x);
-    const vy=3*v*v*(f.c1.y-f.start.y)+6*v*u*(f.c2.y-f.c1.y)+3*u*u*(f.end.y-f.c2.y),speed=Math.hypot(vx,vy);
-    if(speed>.01){
-      scene.heading={x:vx/speed,y:vy/speed};
-      const target=Math.atan2(vy,vx)*180/Math.PI+90;
-      if(scene.bank===null)scene.bank=target;
-      const turn=Math.atan2(Math.sin((target-scene.bank)*Math.PI/180),Math.cos((target-scene.bank)*Math.PI/180))*180/Math.PI;
-      scene.bank+=turn*(1-Math.exp(-delta/210));
+    const f=scene.flight,dt=Math.min(delta,50)/1000;
+    f.clock+=delta;f.steerTime+=delta;scene.elapsed+=delta;
+    if(f.steerTime>=f.steerLimit){
+      f.steerTime=0;f.steerLimit=1400+Math.random()*2200;
+      f.turnTarget=(Math.random()-.5)*1.1;f.speedTarget=21+Math.random()*15;
+      f.windTargetX=(Math.random()-.5)*6;f.windTargetY=(Math.random()-.5)*6;
     }
-    // Upstroke folds deeply; downstroke opens more quickly. The body does not bounce.
+    const drift=1-Math.exp(-dt/1.1);
+    f.turn+=(f.turnTarget-f.turn)*drift;f.speed+=(f.speedTarget-f.speed)*drift;
+    f.windX+=(f.windTargetX-f.windX)*drift;f.windY+=(f.windTargetY-f.windY)*drift;
+    const cycle=f.burst+f.coast,cycleTime=f.clock%cycle;
+    const glide=smooth((cycleTime-f.burst)/180)*(1-smooth((cycleTime-cycle+180)/180));
+    scene.phase+=delta/f.cadence*Math.PI*2*(1-glide);
+    const current=Math.atan2(f.vy,f.vx),desired=current+f.turn*.75;
+    const lookAhead=Math.max(32,Math.min(85,Math.hypot(f.vx,f.vy)*2.1));
+    let steering=desired,best=-Infinity;
+    for(const offset of [0,.32,-.32,.66,-.66,1.1,-1.1,1.65,-1.65,Math.PI]){
+      const candidate=desired+offset,room=clearDistance(scene,candidate,lookAhead)/lookAhead;
+      const score=room*3.5-Math.abs(angleDifference(candidate,current))*.6-Math.abs(offset)*.18;
+      if(score>best){best=score;steering=candidate;}
+    }
+    const forward=clearDistance(scene,current,lookAhead)/lookAhead;
+    const braking=.45+.55*smooth(forward/.8),speed=f.speed*(1.04-.2*glide)*braking;
+    const response=1-Math.exp(-dt/.55);
+    f.vx+=(Math.cos(steering)*speed+f.windX-f.vx)*response;
+    f.vy+=(Math.sin(steering)*speed+f.windY-f.vy)*response;
+    const next={x:scene.point.x+f.vx*dt,y:scene.point.y+f.vy*dt};
+    if(clearPosition(scene,next)){
+      scene.point=next;f.blocked=0;
+    }else{
+      // Slow and fade in a confined pocket rather than bounce off an invisible rail.
+      f.vx*=.88;f.vy*=.88;f.blocked+=delta;
+      if(f.blocked>350&&scene.fadeOut<=0)scene.fadeOut=1200;
+    }
+    const velocity=Math.hypot(f.vx,f.vy);
+    if(velocity>1){
+      scene.heading={x:f.vx/velocity,y:f.vy/velocity};
+      const target=Math.atan2(f.vy,f.vx)*180/Math.PI+90;
+      if(scene.bank===null)scene.bank=target;
+      const turn=angleDifference(target*Math.PI/180,scene.bank*Math.PI/180)*180/Math.PI;
+      scene.bank+=turn*(1-Math.exp(-dt/.32));
+    }
     const q=((scene.phase/(Math.PI*2))%1+1)%1;
-    const beat=q<.56?1-.91*smooth(q/.56):.09+.91*smooth((q-.56)/.44);
-    const opening=beat*(1-glide)+.96*glide;
+    const beat=q<.56?.98-.74*smooth(q/.56):.24+.74*smooth((q-.56)/.44);
+    const opening=beat*(1-glide)+.96*glide,lift=.14*(1-opening)*(1-glide);
     scene.open=opening;
-    const lift=.2*(1-opening)*(1-glide),lag=.65*Math.sin(scene.phase-.25)*(1-glide);
     scene.art.style.setProperty('--wing-open',String(opening));
-    scene.art.style.setProperty('--wing-right-open',String(clamp(opening+.012*Math.sin(scene.phase)*(1-glide),.08,1)));
+    scene.art.style.setProperty('--wing-right-open',String(clamp(opening+.01*Math.sin(scene.phase)*(1-glide),.22,1)));
     scene.art.style.setProperty('--wing-lift',String(lift));
     scene.art.style.setProperty('--wing-right-lift',String(-lift));
-    scene.art.style.setProperty('--hindwing-lag',`${lag}deg`);
-    scene.bob=0;scene.scale=flightScale(f,u);
+    scene.art.style.setProperty('--hindwing-lag',`${.45*Math.sin(scene.phase-.25)*(1-glide)}deg`);
+    scene.bob=0;scene.scale=1;
     scene.art.classList.toggle('is-gliding',glide>.5);paint(scene);
-    if(scene.elapsed>=f.duration)nextFlight(scene);
   }
   function frame(time){
     const delta=previous?Math.min(time-previous,50):0;previous=time;
