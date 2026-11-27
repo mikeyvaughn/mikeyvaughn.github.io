@@ -20,7 +20,7 @@
   function bounds(scene){
     const right=Math.max(9,scene.width-scene.art.offsetWidth-8);
     // Both entrances and the whole flight stay in the requested right-hand area.
-    const requestedLeft=scene.header?scene.width*.72:scene.statement?scene.width*(scene.width>760?.6:.56):8;
+    const requestedLeft=scene.width>760?(scene.header?scene.width*.72:scene.statement?scene.width*.6:8):8;
     return{left:Math.min(right,Math.max(8,requestedLeft)),right,top:6,bottom:Math.max(7,(scene.zoneHeight||scene.height)-scene.art.offsetHeight-6)};
   }
   function footprint(scene,p,padding=8,scale=1){
