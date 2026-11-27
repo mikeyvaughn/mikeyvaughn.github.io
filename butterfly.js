@@ -58,7 +58,18 @@
   function randomPoint(scene,scale=1){
     const points=scale<1&&scene.smallWaypoints.length?scene.smallWaypoints:scene.waypoints;
     if(!points.length)return{x:bounds(scene).left,y:bounds(scene).top};
-    return{...points[Math.floor(Math.random()*points.length)]};
+    // Prefer pockets with room in two dimensions, instead of spawning in a narrow lane.
+    let chosen=points[Math.floor(Math.random()*points.length)],best=-1;
+    const reach=Math.max(24,Math.min(56,scene.art.offsetWidth*.45));
+    for(let i=0;i<10;i++){
+      const p=points[Math.floor(Math.random()*points.length)];let score=Math.random()*.15;
+      for(let j=0;j<8;j++){
+        const a=j*Math.PI/4;
+        if(clearPosition(scene,{x:p.x+Math.cos(a)*reach,y:p.y+Math.sin(a)*reach}))score++;
+      }
+      if(score>best){best=score;chosen=p;}
+    }
+    return{...chosen};
   }
   const angleDifference=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
   function clearPosition(scene,p){
@@ -74,6 +85,30 @@
     }
     return clear;
   }
+  function loopPattern(scene,f){
+    const heading=Math.atan2(f.vy,f.vx),speed=Math.hypot(f.vx,f.vy)||f.speed;
+    const radii=scene.width<=760?[38,30,23]:[70,56,44];
+    const firstRadius=Math.floor(Math.random()*radii.length);
+    const ordered=radii.slice(firstRadius).concat(radii.slice(0,firstRadius));
+    for(const requestedRadius of ordered){
+      const radius=Math.max(requestedRadius,speed/1.05);
+      const first=Math.random()<.5?1:-1;
+      for(const sign of [first,-first]){
+        const center={x:scene.point.x-Math.sin(heading)*radius*sign,y:scene.point.y+Math.cos(heading)*radius*sign};
+        const start=heading-sign*Math.PI/2;let safe=true;
+        for(let i=0;i<32;i++){
+          const angle=start+sign*i/32*Math.PI*2;
+          if(!clearPosition(scene,{x:center.x+Math.cos(angle)*radius,y:center.y+Math.sin(angle)*radius})){safe=false;break;}
+        }
+        if(safe){
+          const omega=Math.min(1.1,speed/radius);
+          return{kind:'loop',sign,rate:sign*Math.asin(Math.min(.7,omega*.55))/.75,
+            started:f.clock,lastAngle:heading,rotated:0,timeout:Math.min(19000,Math.PI*2/omega*1350)};
+        }
+      }
+    }
+    return null;
+  }
   function nextFlight(scene){
     // Free steering and velocity, not an endpoint or a pre-drawn curve.
     let angle=Math.atan2(scene.heading.y,scene.heading.x),room=-1;
@@ -82,12 +117,12 @@
       const score=clear+Math.random()*12;
       if(score>room){room=score;angle=candidate;}
     }
-    const speed=22+Math.random()*12;
+    const speed=30+Math.random()*14;
     scene.flight={vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
       turn:0,turnTarget:(Math.random()-.5)*1.1,steerTime:0,steerLimit:1400+Math.random()*1800,
       speed,speedTarget:speed,windX:0,windY:0,windTargetX:0,windTargetY:0,
       cadence:300+Math.random()*70,burst:900+Math.random()*650,coast:850+Math.random()*850,
-      clock:Math.random()*500,blocked:0};scene.elapsed=0;
+      clock:Math.random()*500,blocked:0,pattern:null,patternNext:2400+Math.random()*2000,completedLoops:0};scene.elapsed=0;
     scene.heading={x:Math.cos(angle),y:Math.sin(angle)};
   }
   function entrance(scene){
@@ -139,8 +174,27 @@
     f.clock+=delta;f.steerTime+=delta;scene.elapsed+=delta;
     if(f.steerTime>=f.steerLimit){
       f.steerTime=0;f.steerLimit=1400+Math.random()*2200;
-      f.turnTarget=(Math.random()-.5)*1.1;f.speedTarget=21+Math.random()*15;
-      f.windTargetX=(Math.random()-.5)*6;f.windTargetY=(Math.random()-.5)*6;
+      f.turnTarget=(Math.random()-.5)*1.35;f.speedTarget=30+Math.random()*18;
+      f.windTargetX=(Math.random()-.5)*8;f.windTargetY=(Math.random()-.5)*8;
+    }
+    if(!f.pattern&&f.clock>=f.patternNext){
+      f.pattern=Math.random()<.6?loopPattern(scene,f):null;f.patternNext=f.clock+4200+Math.random()*3500;
+      if(!f.pattern)f.turnTarget=(Math.random()<.5?-1:1)*(.45+Math.random()*.3);
+      if(f.pattern)scene.outingLimit=Math.min(34000,Math.max(scene.outingLimit||0,(scene.outing||0)+f.pattern.timeout+600));
+    }
+    if(f.pattern){
+      const currentAngle=Math.atan2(f.vy,f.vx);
+      f.pattern.rotated+=f.pattern.sign*angleDifference(currentAngle,f.pattern.lastAngle);
+      f.pattern.lastAngle=currentAngle;
+      if(f.pattern.rotated>=5.9||f.clock-f.pattern.started>f.pattern.timeout){
+        if(f.pattern.rotated>=5.9)f.completedLoops++;
+        f.pattern=null;f.patternNext=f.clock+4200+Math.random()*4500;
+        f.turnTarget=(Math.random()-.5)*1.2;
+      }else{
+        // Sustained bank creates a loose loop through velocity, not a circular rail.
+        const t=(f.clock-f.pattern.started)/1000;
+        f.turnTarget=f.pattern.rate*(.94+.1*Math.sin(t*1.7));
+      }
     }
     const drift=1-Math.exp(-dt/1.1);
     f.turn+=(f.turnTarget-f.turn)*drift;f.speed+=(f.speedTarget-f.speed)*drift;
@@ -153,7 +207,7 @@
     let steering=desired,best=-Infinity;
     for(const offset of [0,.32,-.32,.66,-.66,1.1,-1.1,1.65,-1.65,Math.PI]){
       const candidate=desired+offset,room=clearDistance(scene,candidate,lookAhead)/lookAhead;
-      const score=room*3.5-Math.abs(angleDifference(candidate,current))*.6-Math.abs(offset)*.18;
+      const score=room*3.5-Math.abs(angleDifference(candidate,current))*.14-Math.abs(offset)*.85;
       if(score>best){best=score;steering=candidate;}
     }
     const forward=clearDistance(scene,current,lookAhead)/lookAhead;
@@ -181,13 +235,15 @@
     const beat=q<.56?.98-.74*smooth(q/.56):.24+.74*smooth((q-.56)/.44);
     const opening=beat*(1-glide)+.96*glide,lift=.14*(1-opening)*(1-glide);
     scene.open=opening;
-    scene.art.style.setProperty('--wing-open',String(opening));
-    scene.art.style.setProperty('--wing-right-open',String(clamp(opening+.01*Math.sin(scene.phase)*(1-glide),.22,1)));
+    const bank=clamp(f.turn,-1,1)*.055;
+    scene.art.style.setProperty('--wing-open',String(clamp(opening*(1-bank),.22,1)));
+    scene.art.style.setProperty('--wing-right-open',String(clamp(opening*(1+bank)+.01*Math.sin(scene.phase)*(1-glide),.22,1)));
     scene.art.style.setProperty('--wing-lift',String(lift));
     scene.art.style.setProperty('--wing-right-lift',String(-lift));
     scene.art.style.setProperty('--hindwing-lag',`${.45*Math.sin(scene.phase-.25)*(1-glide)}deg`);
     scene.bob=0;scene.scale=1;
-    scene.art.classList.toggle('is-gliding',glide>.5);paint(scene);
+    scene.art.classList.toggle('is-gliding',glide>.5);
+    scene.art.classList.toggle('is-looping',!!f.pattern);paint(scene);
   }
   function frame(time){
     const delta=previous?Math.min(time-previous,50):0;previous=time;
