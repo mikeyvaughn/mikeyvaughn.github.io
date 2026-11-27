@@ -12,21 +12,28 @@
   const scenes=[...document.querySelectorAll('.header-band,.statement,.digital,.footer')].map((section,index)=>{
     const layer=document.createElement('div');layer.className='mfv-butterfly-surface';layer.setAttribute('aria-hidden','true');
     const art=source.cloneNode(true);layer.append(art);section.append(layer);
-    art.querySelectorAll('[id]').forEach(node=>{const old=node.id,next=`mfv-${index}-${old}`;node.id=next;art.querySelectorAll(`[href="#${old}"]`).forEach(use=>use.setAttribute('href',`#${next}`));});
+    art.querySelectorAll('[id]').forEach(node=>{
+      const old=node.id,next=`mfv-${index}-${old}`;node.id=next;
+      art.querySelectorAll(`[href="#${old}"]`).forEach(use=>use.setAttribute('href',`#${next}`));
+      art.querySelectorAll('[clip-path]').forEach(use=>{if(use.getAttribute('clip-path')===`url(#${old})`)use.setAttribute('clip-path',`url(#${next})`);});
+    });
     art.classList.toggle('on-header',section.classList.contains('header-band'));
-    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),statement:section.classList.contains('statement'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:0,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,outing:0,outingLimit:19000+Math.random()*7000,cooldown:0,fadeOut:0};
+    return{section,art,layer,header:section.classList.contains('header-band'),footer:section.classList.contains('footer'),statement:section.classList.contains('statement'),digital:section.classList.contains('digital'),zoneHeight:0,point:null,heading:{x:Math.random()<.5?-1:1,y:0},bank:null,phase:Math.random()*Math.PI*2,open:.98,bob:0,flight:null,elapsed:0,width:0,height:0,obstacles:[],waypoints:[],safe:false,scale:1,outing:0,outingLimit:19000+Math.random()*7000,cooldown:0,fadeOut:0};
   });
   template.remove();
   function bounds(scene){
     const right=Math.max(9,scene.width-scene.art.offsetWidth-8);
     // Both entrances and the whole flight stay in the requested right-hand area.
     const requestedLeft=scene.width>760?(scene.header?scene.width*.72:scene.statement?scene.width*.6:8):8;
-    return{left:Math.min(right,Math.max(8,requestedLeft)),right,top:6,bottom:Math.max(7,(scene.zoneHeight||scene.height)-scene.art.offsetHeight-6)};
+    const radius=scene.art.offsetWidth*.48,cy=scene.art.offsetHeight*.525;
+    const top=Math.max(6,Math.ceil(radius-cy)+6);
+    return{left:Math.min(right,Math.max(8,requestedLeft)),right,top,bottom:Math.max(top+1,(scene.zoneHeight||scene.height)-cy-radius-6)};
   }
   function footprint(scene,p,padding=8,scale=1){
     const w=scene.art.offsetWidth,h=scene.art.offsetHeight;
-    // SVG ink bounds plus space for bank, bob and comfortable text clearance.
-    return{left:p.x+w*.5-w*.44*scale-padding,right:p.x+w*.5+w*.44*scale+padding,top:p.y+h*.78-h*.68*scale-padding,bottom:p.y+h*.78+h*.03*scale+padding};
+    // Rotation-safe envelope around the thorax; flight heading can now turn freely.
+    const radius=w*.48*scale+padding,cx=p.x+w*.5,cy=p.y+h*.525;
+    return{left:cx-radius,right:cx+radius,top:cy-radius,bottom:cy+radius};
   }
   function clearPoint(scene,p,padding=8,scale=1){
     const a=footprint(scene,p,padding,scale);
@@ -68,24 +75,27 @@
     for(let attempt=0;attempt<100;attempt++){
       const end=randomPoint(scene),dx=end.x-scene.point.x,dy=end.y-scene.point.y;
       const distance=Math.hypot(dx,dy)||1,direction={x:dx/distance,y:dy/distance};
+      if(attempt<75&&(distance<Math.min(65,scene.width*.1)||direction.x*scene.heading.x+direction.y*scene.heading.y<-.25))continue;
       const reach=clamp(distance*.3,14,140),bend=(Math.random()-.5)*Math.min(90,distance*.26);
       const f={start:{...scene.point},startScale:scene.scale||1,endScale:1,end,
         c1:limit({x:scene.point.x+scene.heading.x*reach,y:scene.point.y+scene.heading.y*reach}),
         c2:limit({x:end.x-direction.x*reach-direction.y*bend,y:end.y-direction.y*reach+direction.x*bend}),
-        duration:clamp(distance/(22+Math.random()*8)*1000,7000,28000),perch:false,takeoff:false,cadence:680+Math.random()*240,rest:0,
+        duration:clamp(distance/(28+Math.random()*9)*1000,1800,20000),perch:false,takeoff:false,cadence:125+Math.random()*28,burst:650+Math.random()*450,coast:280+Math.random()*380,rest:0,
         glideStart:.22+Math.random()*.16,glideLength:.08+Math.random()*.07,secondGlide:.65+Math.random()*.12};
       if(clearCurve(scene,f)){chosen=f;break;}
     }
+    if(!chosen)scene.fadeOut=1200;
     scene.flight=chosen||{start:{...scene.point},startScale:1,endScale:1,end:{...scene.point},c1:{...scene.point},c2:{...scene.point},duration:3500,perch:false,takeoff:false,rest:0,glideStart:.15,glideLength:.6};scene.elapsed=0;
   }
   function entrance(scene){
     // Reposition only while invisible, never in response to scrolling.
     scene.scale=1;scene.point=randomPoint(scene);scene.art.classList.remove('is-perched');
-    nextFlight(scene);paint(scene);
+    nextFlight(scene);
+    const f=scene.flight;scene.bank=Math.atan2(f.c1.y-f.start.y,f.c1.x-f.start.x)*180/Math.PI+90;paint(scene);
   }
   function sizeScene(scene){
     const width=scene.section.clientWidth,height=scene.section.clientHeight;
-    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<760?44:natural,Math.max(42,(height-14)*5/4))}px`;}
+    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<760?44:natural,Math.max(42,height-18))}px`;}
     if(width===scene.width&&height===scene.height&&scene.point)return;
     const firstFlight=!scene.point;
     scene.width=width;scene.height=height;
@@ -96,7 +106,7 @@
       const root=scene.section.getBoundingClientRect();
       const paragraph=scene.section.querySelector('.digital-intro>p:not(.eyebrow)');
       scene.zoneHeight=width<760&&paragraph?paragraph.getBoundingClientRect().top-root.top:Math.min(height,600);
-      if(width<760)scene.art.style.width='80px';
+      if(width<760)scene.art.style.width=`${Math.min(78,width*.2)}px`;
     }
     measureContent(scene);
     if(!scene.header||width>760){
@@ -117,26 +127,41 @@
   }
   function paint(scene){
     const b=bounds(scene);
-    // Keep the full wing silhouette inside the section, including its gentle bob.
-    const x=clamp(scene.point.x,b.left,b.right),y=clamp(scene.point.y+scene.bob,b.top,b.bottom);
-    scene.art.style.transform=`translate3d(${x}px,${y}px,0) rotate(${scene.bank}deg) scale(${scene.scale||1})`;
+    // Keep the rotation-safe silhouette within its section. No scroll-coupled motion.
+    const x=clamp(scene.point.x,b.left,b.right),y=clamp(scene.point.y,b.top,b.bottom);
+    scene.art.style.transform=`translate3d(${x}px,${y}px,0) rotate(${scene.bank||0}deg) scale(${scene.scale||1})`;
   }
   function advance(scene,delta){
-    const f=scene.flight,t=Math.min(scene.elapsed/f.duration,1);
-    const window=(start,length)=>smooth((t-start)/.035)*(1-smooth((t-start-length)/.035));
-    const glide=Math.max(window(f.glideStart,f.glideLength),window(f.secondGlide||.74,.065));
-    const cadence=(f.cadence||800)*(1+.13*Math.sin(scene.phase*.27))+glide*1050;
-    scene.phase+=delta/cadence*Math.PI*2;scene.elapsed+=delta*(1+.06*Math.sin(scene.phase)*(1-glide));
+    const f=scene.flight;
+    // Brief powered bursts and variable coasting replace the slow metronomic pulse.
+    const burst=f.burst||850,coast=f.coast||420,cycle=burst+coast;
+    const cycleTime=scene.outing%cycle;
+    const glide=smooth((cycleTime-burst)/100)*(1-smooth((cycleTime-cycle+110)/110));
+    scene.phase+=delta/(f.cadence||140)*Math.PI*2*(1-glide);
+    scene.elapsed+=delta;
     const progress=Math.min(scene.elapsed/f.duration,1),u=progress,v=1-u;
-    scene.point={x:v*v*v*f.start.x+3*v*v*u*f.c1.x+3*v*u*u*f.c2.x+u*u*u*f.end.x,y:v*v*v*f.start.y+3*v*v*u*f.c1.y+3*v*u*u*f.c2.y+u*u*u*f.end.y};
-    const vx=3*v*v*(f.c1.x-f.start.x)+6*v*u*(f.c2.x-f.c1.x)+3*u*u*(f.end.x-f.c2.x),vy=3*v*v*(f.c1.y-f.start.y)+6*v*u*(f.c2.y-f.c1.y)+3*u*u*(f.end.y-f.c2.y),speed=Math.hypot(vx,vy)||1;
-    scene.heading={x:vx/speed,y:vy/speed};
-    scene.bank+=(scene.heading.x*5-scene.bank)*Math.min(1,delta/850);
-    const beat=.6+.38*(.5+.5*Math.cos(scene.phase)),opening=beat*(1-glide)+.94*glide;
-    scene.open+=(opening-scene.open)*Math.min(1,delta/120);
-    scene.art.style.setProperty('--wing-open',String(scene.open));scene.art.style.setProperty('--wing-right-open',String(clamp(scene.open+.009*Math.sin(scene.phase+.1)*(1-glide),.45,.99)));
-    scene.bob=Math.sin(scene.phase-.6)*(1.45*(1-glide)+.2*glide);
-    scene.scale=flightScale(f,u);
+    scene.point=curvePoint(f,u);
+    const vx=3*v*v*(f.c1.x-f.start.x)+6*v*u*(f.c2.x-f.c1.x)+3*u*u*(f.end.x-f.c2.x);
+    const vy=3*v*v*(f.c1.y-f.start.y)+6*v*u*(f.c2.y-f.c1.y)+3*u*u*(f.end.y-f.c2.y),speed=Math.hypot(vx,vy);
+    if(speed>.01){
+      scene.heading={x:vx/speed,y:vy/speed};
+      const target=Math.atan2(vy,vx)*180/Math.PI+90;
+      if(scene.bank===null)scene.bank=target;
+      const turn=Math.atan2(Math.sin((target-scene.bank)*Math.PI/180),Math.cos((target-scene.bank)*Math.PI/180))*180/Math.PI;
+      scene.bank+=turn*(1-Math.exp(-delta/210));
+    }
+    // Upstroke folds deeply; downstroke opens more quickly. The body does not bounce.
+    const q=((scene.phase/(Math.PI*2))%1+1)%1;
+    const beat=q<.56?1-.91*smooth(q/.56):.09+.91*smooth((q-.56)/.44);
+    const opening=beat*(1-glide)+.96*glide;
+    scene.open=opening;
+    const lift=.2*(1-opening)*(1-glide),lag=.65*Math.sin(scene.phase-.25)*(1-glide);
+    scene.art.style.setProperty('--wing-open',String(opening));
+    scene.art.style.setProperty('--wing-right-open',String(clamp(opening+.012*Math.sin(scene.phase)*(1-glide),.08,1)));
+    scene.art.style.setProperty('--wing-lift',String(lift));
+    scene.art.style.setProperty('--wing-right-lift',String(-lift));
+    scene.art.style.setProperty('--hindwing-lag',`${lag}deg`);
+    scene.bob=0;scene.scale=flightScale(f,u);
     scene.art.classList.toggle('is-gliding',glide>.5);paint(scene);
     if(scene.elapsed>=f.duration)nextFlight(scene);
   }
