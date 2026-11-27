@@ -574,3 +574,21 @@ body .about-prose>p:last-of-type{margin-bottom:16px}
  body .about-personal-details p{max-width:none}
  body .about-personal-details .about-personal{padding:0;margin:0;border:0}
 }
+
+/* Painted conversation artwork belongs with the contact heading, at a readable scale. */
+@media(min-width:1001px){
+ .conversation-heading{gap:24px;align-items:center}
+ .conversation-heading img{width:128px;flex-basis:128px;align-self:center}
+}
+@media(min-width:761px) and (max-width:1000px){
+ .conversation-heading img{width:96px;flex-basis:96px;align-self:center}
+}
+@media(max-width:760px){
+ .footer-main>div:first-child:has(.conversation-heading)>.eyebrow{min-height:0;padding-right:0;display:block;margin-bottom:16px}
+ .conversation-heading{display:grid;grid-template-columns:minmax(0,1fr) 84px;align-items:center;gap:16px}
+ .conversation-heading img{position:static;width:84px;flex-basis:auto;align-self:center;justify-self:center}
+}
+@media(max-width:380px){
+ .conversation-heading{grid-template-columns:minmax(0,1fr) 72px;gap:12px}
+ .conversation-heading img{width:72px}
+}
