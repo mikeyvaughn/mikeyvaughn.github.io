@@ -660,3 +660,12 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
  .hero{row-gap:16px}
  .hero-intro>p:not(.hero-role){max-width:none;line-height:1.7}
 }
+
+/* Connect the Labor subtitle and introduction without unused heading-column space. */
+@media(min-width:1001px){
+ .union-intro .union-deck{grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);column-gap:28px}
+}
+@media(min-width:761px) and (max-width:1000px){
+ .union-intro .union-deck{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);column-gap:24px}
+}
+@media(max-width:760px){.union-intro .union-deck{row-gap:12px}}
