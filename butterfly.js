@@ -61,7 +61,8 @@
     // The header crosses behind navigation labels; links remain above the decorative layer.
     if(scene.header&&scene.width>760){
       const nav=scene.section.querySelector('nav'),r=nav?.getBoundingClientRect();
-      scene.navRoute=r?{left:8,right:scene.width-scene.art.offsetWidth-8}:null;
+      const name=scene.section.querySelector('.brand-logo')?.getBoundingClientRect();
+      scene.navRoute=r?{left:Math.min(scene.width-scene.art.offsetWidth-8,name?name.right-root.left+16:r.left-root.left-scene.art.offsetWidth*.5),right:scene.width-scene.art.offsetWidth-8}:null;
       scene.obstacles=[];scene.safe=!!r;
       const b=bounds(scene);scene.waypoints=[{x:b.left,y:(b.top+b.bottom)/2}];scene.smallWaypoints=[];return;
     }
@@ -229,7 +230,7 @@
     if(scene.header&&scene.navRoute){
       const b=bounds(scene),span=Math.max(1,b.right-b.left);
       f.headerTime=(f.headerTime||0)+dt;
-      // A broad S across the whole header, past the tabs and name, with soft end turns.
+      // A broad S across the tabs and open space, turning clear of the name.
       const t=f.headerTime/(span/43)*Math.PI;
       const u=(1+Math.cos(t))/2;
       const amplitude=(b.bottom-b.top)*.43;
