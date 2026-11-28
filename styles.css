@@ -699,3 +699,9 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
 /* Full-width portraits with room around faces and matching campaign frames. */
 .campaign-photo img{aspect-ratio:1.28}
 .campaign-photo-seema img{width:100%;height:auto;object-fit:cover;object-position:50% 14%}
+
+/* A stable caption row keeps the article link from shifting the carousel. */
+.hero-story-slot{min-height:44px;margin-top:4px}
+.hero-story-slot a{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:.85rem;font-weight:600}
+.hero-story-slot a[hidden]{display:none}
+.hero-story-slot a span{display:inline;font-size:inherit;margin:0}
