@@ -326,7 +326,7 @@
       if(active.cooldown>0){active.cooldown=Math.max(0,active.cooldown-delta);if(active.cooldown===0){active.outing=0;active.outingLimit=outingDuration(active.header);entrance(active);}}
       else{
         advance(active,delta);active.outing+=delta;
-        if(active.fadeOut>0){active.fadeOut-=delta;if(active.fadeOut<=0)active.cooldown=active.header?7000+Math.random()*6000:4000+Math.random()*3000;}
+        if(active.fadeOut>0){active.fadeOut-=delta;if(active.fadeOut<=0)active.cooldown=3000+Math.random()*1000;}
         else if(!active.header&&active.outing>active.outingLimit)active.fadeOut=1400;
       }
     }
