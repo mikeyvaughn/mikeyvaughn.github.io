@@ -14,7 +14,7 @@
     const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.id=original.id;
     original.removeAttribute('id');original.replaceWith(group);original.classList.add('monarch-cream');original.style.opacity='1';original.setAttribute('opacity','1');original.setAttribute('visibility','visible');
     const color=original.cloneNode(true);color.setAttribute('class','monarch-color');
-    color.setAttribute('href','assets/monarch-natural-color.png');color.style.opacity='0';color.setAttribute('opacity','0');color.setAttribute('visibility','hidden');
+    color.setAttribute('href','assets/monarch-natural-color-textured.png');color.style.opacity='0';color.setAttribute('opacity','0');color.setAttribute('visibility','hidden');
     group.append(original,color);
   }
   // Each green section owns its artwork and route in local section coordinates.
@@ -305,9 +305,10 @@
       const r=scene.art.getBoundingClientRect();
       hit=pointer.x>=r.left&&pointer.x<=r.right&&pointer.y>=r.top&&pointer.y<=r.bottom;
     }
-    const amount=1-Math.exp(-Math.min(delta,50)/(hit?120:220));
-    scene.color=(scene.color||0)+((hit?1:0)-(scene.color||0))*amount;
-    if(scene.color<.001)scene.color=0;
+    const amount=1-Math.exp(-Math.min(delta,50)/(hit?120:220)),previousColor=scene.color||0;
+    scene.color=previousColor+((hit?1:0)-previousColor)*amount;
+    if(scene.color<.001)scene.color=0;else if(scene.color>.999)scene.color=1;
+    if(scene.color===previousColor)return;
     scene.art.style.setProperty('--color-reveal',String(scene.color));
     scene.art.querySelector('.monarch-cream').style.opacity=String(1-scene.color);
     const creamLayer=scene.art.querySelector('.monarch-cream'),colorLayer=scene.art.querySelector('.monarch-color');
