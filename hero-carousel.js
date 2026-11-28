@@ -9,6 +9,7 @@
   const meta = carousel.querySelector('[data-caption-meta]');
   const caption = carousel.querySelector('.hero-carousel-caption');
   const position = carousel.querySelector('[data-position]');
+  const story = carousel.querySelector('[data-caption-story]');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const interval = 3000;
   let current = 0;
@@ -56,6 +57,7 @@
     dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === current)));
     title.textContent = slides[current].dataset.title;
     meta.textContent = slides[current].dataset.meta;
+    if (story) story.hidden = slides[current].dataset.photo !== 'original';
     position.textContent = `${current + 1} / ${slides.length}`;
     loadPhoto(current + 1);
     updatePlayback();
