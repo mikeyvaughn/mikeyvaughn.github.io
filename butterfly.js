@@ -12,9 +12,9 @@
   function installColorReveal(art){
     const svg=art.querySelector('svg'),original=svg.querySelector('defs image');
     const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.id=original.id;
-    original.removeAttribute('id');original.replaceWith(group);original.classList.add('monarch-cream');
+    original.removeAttribute('id');original.replaceWith(group);original.classList.add('monarch-cream');original.style.opacity='1';original.setAttribute('opacity','1');original.setAttribute('visibility','visible');
     const color=original.cloneNode(true);color.setAttribute('class','monarch-color');
-    color.setAttribute('href','assets/monarch-natural-color.png');
+    color.setAttribute('href','assets/monarch-natural-color.png');color.style.opacity='0';color.setAttribute('opacity','0');color.setAttribute('visibility','hidden');
     group.append(original,color);
   }
   // Each green section owns its artwork and route in local section coordinates.
@@ -309,6 +309,12 @@
     scene.color=(scene.color||0)+((hit?1:0)-(scene.color||0))*amount;
     if(scene.color<.001)scene.color=0;
     scene.art.style.setProperty('--color-reveal',String(scene.color));
+    scene.art.querySelector('.monarch-cream').style.opacity=String(1-scene.color);
+    const creamLayer=scene.art.querySelector('.monarch-cream'),colorLayer=scene.art.querySelector('.monarch-color');
+    colorLayer.style.opacity=String(scene.color);
+    creamLayer.setAttribute('opacity',String(1-scene.color));
+    colorLayer.setAttribute('opacity',String(scene.color));
+    colorLayer.setAttribute('visibility',scene.color>.001?'visible':'hidden');
     scene.art.classList.toggle('is-color-active',scene.color>.005);
     if(scene.footer)scene.art.querySelector('filter[id$="footer-foreground"] feFuncA')?.setAttribute('slope',String(.34+.66*scene.color));
   }

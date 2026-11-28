@@ -32,7 +32,5 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 @media(min-width:761px){.header-band .brand-logo{position:relative;z-index:2}}
 
 /* Desktop pointer proximity reveals the original drawing in monarch colors without intercepting links. */
-.mfv-butterfly .monarch-color{opacity:var(--color-reveal,0)}
-.mfv-butterfly .monarch-cream{opacity:calc(1 - var(--color-reveal,0))}
 
 .mfv-butterfly.is-color-active{transition:opacity .12s ease}
