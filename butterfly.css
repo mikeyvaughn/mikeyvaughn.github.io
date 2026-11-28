@@ -28,3 +28,5 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 
 /* Navigation stays legible above the header butterfly’s S-shaped flight. */
 .header-band nav{position:relative;z-index:2}
+
+@media(min-width:761px){.header-band .brand-logo{position:relative;z-index:2}}

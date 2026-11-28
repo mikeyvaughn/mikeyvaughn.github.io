@@ -61,7 +61,7 @@
     // The header crosses behind navigation labels; links remain above the decorative layer.
     if(scene.header&&scene.width>760){
       const nav=scene.section.querySelector('nav'),r=nav?.getBoundingClientRect();
-      scene.navRoute=r?{left:r.left-root.left-scene.art.offsetWidth*.5,right:r.right-root.left-scene.art.offsetWidth*.5}:null;
+      scene.navRoute=r?{left:8,right:scene.width-scene.art.offsetWidth-8}:null;
       scene.obstacles=[];scene.safe=!!r;
       const b=bounds(scene);scene.waypoints=[{x:b.left,y:(b.top+b.bottom)/2}];scene.smallWaypoints=[];return;
     }
@@ -152,7 +152,7 @@
     // Reposition only while invisible, never in response to scrolling.
     scene.scale=1;scene.point=randomPoint(scene);scene.art.classList.remove('is-perched');
     nextFlight(scene);
-    if(scene.header&&scene.navRoute){const b=bounds(scene);scene.point={x:b.left,y:(b.top+b.bottom)/2};scene.flight.headerTime=0;scene.flight.headerPhase=Math.random()*.24-.12;}
+    if(scene.header&&scene.navRoute){const b=bounds(scene);scene.point={x:b.right,y:(b.top+b.bottom)/2};scene.outingLimit=Math.max(scene.outingLimit,(b.right-b.left)/43*1000+3500);scene.flight.headerTime=0;scene.flight.headerPhase=Math.random()*.24-.12;}
     scene.bank=Math.atan2(scene.flight.vy,scene.flight.vx)*180/Math.PI+90;paint(scene);
   }
   function sizeScene(scene){
@@ -229,9 +229,9 @@
     if(scene.header&&scene.navRoute){
       const b=bounds(scene),span=Math.max(1,b.right-b.left);
       f.headerTime=(f.headerTime||0)+dt;
-      // A broad S across the tabs, with a soft turn at each end and a shallow vertical sweep.
+      // A broad S across the whole header, past the tabs and name, with soft end turns.
       const t=f.headerTime/(span/43)*Math.PI;
-      const u=(1-Math.cos(t))/2;
+      const u=(1+Math.cos(t))/2;
       const amplitude=(b.bottom-b.top)*.43;
       const next={x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(u*Math.PI*2+(f.headerPhase||0))*amplitude};
       f.vx=(next.x-scene.point.x)/Math.max(dt,.001);f.vy=(next.y-scene.point.y)/Math.max(dt,.001);
