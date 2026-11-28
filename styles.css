@@ -688,3 +688,10 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
 .campaign-note{align-items:start}
 .campaign-note-heading{font-family:var(--serif);font-size:clamp(1.45rem,2.3vw,1.75rem);font-weight:500;line-height:1.18;letter-spacing:-.012em;margin:0;max-width:20ch;color:var(--pine)}
 @media(max-width:760px){.campaign .campaign-owner{font-size:1rem}.campaign p.campaign-role-title{font-size:1.5rem;margin-bottom:18px}.campaign-note-heading{font-size:1.5rem;max-width:25ch}.campaign-note{gap:14px}}
+
+/* Shared campaign work: separate organizing and communications into readable paragraphs. */
+.campaign-note{column-gap:40px;padding-top:28px}
+.campaign-note-copy{max-width:66ch}
+.campaign-note .campaign-note-copy p{max-width:none;line-height:1.8}
+.campaign-note-copy p+p{margin-top:18px}
+@media(max-width:760px){.campaign-note{row-gap:18px}.campaign-note-copy p+p{margin-top:16px}}
