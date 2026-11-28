@@ -17,7 +17,7 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 /* Decorative layers scroll naturally with their own evergreen section. */
 :where(.header-band,.statement,.digital,.footer){position:relative}
 
-@media(max-width:760px){.header-band .mfv-butterfly-surface{display:none}}
+@media(max-width:760px){.header-band .brand-logo,.header-band .menu-toggle{z-index:2}}
 
 .mfv-butterfly .hindwing{transform-origin:100px 84px;transform:rotate(var(--hindwing-lag,0deg))}
 .mfv-butterfly .wing-right .hindwing{transform:rotate(calc(-1 * var(--hindwing-lag,0deg)))}

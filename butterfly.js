@@ -41,7 +41,7 @@
     const right=Math.max(9,scene.width-scene.art.offsetWidth-8);
     // Both entrances and the whole flight stay in the requested right-hand area.
     const requestedLeft=scene.width>760?(scene.header&&scene.navRoute?scene.navRoute.left:scene.statement?scene.width*.6:8):8;
-    const radius=scene.art.offsetWidth*.48,cy=scene.art.offsetHeight*.525;
+    const radius=scene.header&&scene.width<=760?Math.hypot(scene.art.offsetWidth,scene.art.offsetHeight)/2:scene.art.offsetWidth*.48,cy=scene.art.offsetHeight*.525;
     const top=Math.max(6,Math.ceil(radius-cy)+6);
     return{left:Math.min(right,Math.max(8,requestedLeft)),right:scene.header&&scene.navRoute?Math.min(right,scene.navRoute.right):right,top,bottom:Math.max(top+1,(scene.zoneHeight||scene.height)-cy-radius-6)};
   }
@@ -59,11 +59,13 @@
     const root=scene.section.getBoundingClientRect(),rects=[];
     const add=r=>{if(r.width>0&&r.height>0)rects.push({left:r.left-root.left,right:r.right-root.left,top:r.top-root.top,bottom:r.bottom-root.top});};
     // The header crosses behind navigation labels; links remain above the decorative layer.
-    if(scene.header&&scene.width>760){
+    if(scene.header){
       const nav=scene.section.querySelector('nav'),r=nav?.getBoundingClientRect();
-      const name=scene.section.querySelector('.brand-logo')?.getBoundingClientRect();
-      scene.navRoute=r?{left:Math.min(scene.width-scene.art.offsetWidth-8,name?name.right-root.left+16:r.left-root.left-scene.art.offsetWidth*.5),right:scene.width-scene.art.offsetWidth-8}:null;
-      scene.obstacles=[];scene.safe=!!r;
+      const name=(scene.section.querySelector('.brand-logo img')||scene.section.querySelector('.brand-logo'))?.getBoundingClientRect();
+      scene.navRoute=scene.width<=760&&name?
+        {left:8,right:Math.max(8,name.left-root.left-scene.art.offsetWidth-10),vertical:true}:
+        r?{left:Math.min(scene.width-scene.art.offsetWidth-8,name?name.right-root.left+16:r.left-root.left-scene.art.offsetWidth*.5),right:scene.width-scene.art.offsetWidth-8}:null;
+      scene.obstacles=[];scene.safe=!!scene.navRoute;
       const b=bounds(scene);scene.waypoints=[{x:b.left,y:(b.top+b.bottom)/2}];scene.smallWaypoints=[];return;
     }
     const walker=document.createTreeWalker(scene.section,NodeFilter.SHOW_TEXT);let node;
@@ -158,12 +160,12 @@
   }
   function sizeScene(scene){
     const width=scene.section.clientWidth,height=scene.section.clientHeight;
-    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<760?44:64,Math.max(42,height-18))}px`;}
+    if(scene.header){scene.art.style.width='';const natural=scene.art.offsetWidth;scene.art.style.width=`${Math.min(natural,width<=760?24:64,Math.max(42,height-18))}px`;}
     if(width===scene.width&&height===scene.height&&scene.point)return;
     const firstFlight=!scene.point;
     scene.width=width;scene.height=height;
     if(!scene.header)scene.art.style.width='';
-    scene.zoneHeight=height;
+    scene.zoneHeight=scene.header&&width<=760?Math.min(height,64):height;
     if(scene.digital){
       // Keep this tall section's route near its introduction, rather than below it.
       const root=scene.section.getBoundingClientRect();
@@ -182,10 +184,10 @@
   }
   function showScene(){
     // Visibility selects one scene. It never rebases any flight coordinates.
-    const ranked=scenes.map(scene=>{const r=scene.section.getBoundingClientRect();return{scene,visible:Math.max(0,Math.min(innerHeight,r.bottom)-Math.max(0,r.top))};}).filter(row=>row.visible>40&&row.scene.safe&&!(row.scene.header&&innerWidth<=760));
+    const ranked=scenes.map(scene=>{const r=scene.section.getBoundingClientRect();return{scene,visible:Math.max(0,Math.min(innerHeight,r.bottom)-Math.max(0,r.top))};}).filter(row=>row.visible>40&&row.scene.safe);
     ranked.sort((a,b)=>scrollY<100&&a.scene.header!==b.scene.header?(a.scene.header?-1:1):b.visible-a.visible);
     const active=ranked[0]?.scene;
-    scenes.forEach(scene=>scene.art.classList.toggle('is-visible',scene===active&&!reduced.matches&&scene.cooldown<=0&&scene.fadeOut<=0));
+    scenes.forEach(scene=>scene.art.classList.toggle('is-visible',(scene===active||(scene.header&&scene.width<=760&&scene.section.getBoundingClientRect().bottom>0))&&!reduced.matches&&scene.cooldown<=0&&scene.fadeOut<=0));
     return active;
   }
   function paint(scene){
@@ -231,11 +233,13 @@
       const b=bounds(scene),span=Math.max(1,b.right-b.left);
       f.headerTime=(f.headerTime||0)+dt;
       // A continuous S flight: vertical velocity remains nonzero at each rounded end turn.
-      const t=f.headerTime/(span/43)*Math.PI;
+      const t=f.headerTime/(scene.navRoute.vertical?4.5:span/43)*Math.PI;
       const u=(1+Math.cos(t))/2;
       const amplitude=(b.bottom-b.top)*.49;
       const sweeps=Math.max(3,Math.round(span/280)*2-1);
-      const next={x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(t*sweeps)*amplitude};
+      const next=scene.navRoute.vertical?
+        {x:(b.left+b.right)/2+Math.sin(t*3)*span*.48,y:b.top+(b.bottom-b.top)*u}:
+        {x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(t*sweeps)*amplitude};
       f.vx=(next.x-scene.point.x)/Math.max(dt,.001);f.vy=(next.y-scene.point.y)/Math.max(dt,.001);
       scene.point=next;f.turn=Math.sin(u*Math.PI*2)*.22;f.pattern=null;f.blocked=0;
     }else{
@@ -286,7 +290,9 @@
   function frame(time){
     const delta=previous?Math.min(time-previous,50):0;previous=time;
     const active=showScene();
-    if(active){
+    const flying=active?[active]:[];
+    for(const scene of scenes)if(scene.header&&scene.width<=760&&scene.safe&&scene!==active&&scene.section.getBoundingClientRect().bottom>0)flying.push(scene);
+    for(const active of flying){
       if(active.cooldown>0){active.cooldown=Math.max(0,active.cooldown-delta);if(active.cooldown===0){active.outing=0;active.outingLimit=outingDuration(active.header);entrance(active);}}
       else{
         advance(active,delta);active.outing+=delta;
