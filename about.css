@@ -37,7 +37,7 @@
  .about-story-layout>div:first-child{width:auto;justify-self:stretch}
  .about-story-layout h2{font-size:2rem;line-height:1.12;margin-top:12px}
  .about-story-heading{gap:10px;margin-top:0}
- .about-story-symbol{width:88px;height:auto}
+ .about-story-symbol{width:120px;height:auto}
  .about-story-heading h2{margin-top:0}
 }
 
@@ -59,6 +59,6 @@
 .about-story-copy p+p{margin-top:18px}
 
 /* The village line uses the same body type; paragraph spacing gives it separation. */
-@media(max-width:380px){.about-story-symbol{width:80px}.about-story-heading h2{font-size:1.85rem}}
+@media(max-width:380px){.about-story-symbol{width:112px}.about-story-heading h2{font-size:1.85rem}}
 
 .about-story-copy .about-story-closing{font-weight:700}
