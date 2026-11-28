@@ -230,11 +230,12 @@
     if(scene.header&&scene.navRoute){
       const b=bounds(scene),span=Math.max(1,b.right-b.left);
       f.headerTime=(f.headerTime||0)+dt;
-      // A broad S across the tabs and open space, turning clear of the name.
+      // A continuous S flight: vertical velocity remains nonzero at each rounded end turn.
       const t=f.headerTime/(span/43)*Math.PI;
       const u=(1+Math.cos(t))/2;
-      const amplitude=(b.bottom-b.top)*.43;
-      const next={x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(u*Math.PI*2+(f.headerPhase||0))*amplitude};
+      const amplitude=(b.bottom-b.top)*.49;
+      const sweeps=Math.max(3,Math.round(span/280)*2-1);
+      const next={x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(t*sweeps)*amplitude};
       f.vx=(next.x-scene.point.x)/Math.max(dt,.001);f.vy=(next.y-scene.point.y)/Math.max(dt,.001);
       scene.point=next;f.turn=Math.sin(u*Math.PI*2)*.22;f.pattern=null;f.blocked=0;
     }else{
@@ -290,7 +291,7 @@
       else{
         advance(active,delta);active.outing+=delta;
         if(active.fadeOut>0){active.fadeOut-=delta;if(active.fadeOut<=0)active.cooldown=active.header?7000+Math.random()*6000:4000+Math.random()*3000;}
-        else if(active.outing>active.outingLimit)active.fadeOut=1400;
+        else if(!active.header&&active.outing>active.outingLimit)active.fadeOut=1400;
       }
     }
     raf=requestAnimationFrame(frame);
