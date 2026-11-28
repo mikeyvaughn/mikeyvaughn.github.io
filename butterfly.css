@@ -8,10 +8,10 @@
 body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.mfv-butterfly{display:none}}
 
-.mfv-butterfly.is-visible{opacity:.34}
+.mfv-butterfly.is-visible{opacity:calc(.34 + .66 * var(--color-reveal,0))}
 
 .mfv-butterfly-surface{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-.mfv-butterfly.on-header.is-visible{opacity:.22}
+.mfv-butterfly.on-header.is-visible{opacity:calc(.22 + .78 * var(--color-reveal,0))}
 
 
 /* Decorative layers scroll naturally with their own evergreen section. */
@@ -30,3 +30,9 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 .header-band nav{position:relative;z-index:2}
 
 @media(min-width:761px){.header-band .brand-logo{position:relative;z-index:2}}
+
+/* Desktop pointer proximity reveals the original drawing in monarch colors without intercepting links. */
+.mfv-butterfly .monarch-color{opacity:var(--color-reveal,0)}
+.mfv-butterfly .monarch-cream{opacity:calc(1 - var(--color-reveal,0))}
+
+.mfv-butterfly.is-color-active{transition:opacity .12s ease}

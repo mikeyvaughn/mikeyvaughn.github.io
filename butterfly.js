@@ -9,6 +9,14 @@
   let raf=0,previous=0;
   // The decorative effect follows the device's reduced-motion preference.
   try{sessionStorage.removeItem('mfv-butterfly-paused');}catch{}
+  function installColorReveal(art){
+    const svg=art.querySelector('svg'),original=svg.querySelector('defs image');
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.id=original.id;
+    original.removeAttribute('id');original.replaceWith(group);original.classList.add('monarch-cream');
+    const color=original.cloneNode(true);color.setAttribute('class','monarch-color');
+    color.setAttribute('href','assets/monarch-natural-color.png');
+    group.append(original,color);
+  }
   // Each green section owns its artwork and route in local section coordinates.
   const scenes=[...document.querySelectorAll('.header-band,.statement,.digital,.footer')].map((section,index)=>{
     const layer=document.createElement('div');layer.className='mfv-butterfly-surface';layer.setAttribute('aria-hidden','true');
@@ -18,6 +26,7 @@
       art.querySelectorAll(`[href="#${old}"]`).forEach(use=>use.setAttribute('href',`#${next}`));
       art.querySelectorAll('[clip-path]').forEach(use=>{if(use.getAttribute('clip-path')===`url(#${old})`)use.setAttribute('clip-path',`url(#${next})`);});
     });
+    installColorReveal(art,index);
     if(section.classList.contains('footer')){
       // Keep the subtle cream rendering, but occlude the divider beneath the silhouette.
       const svg=art.querySelector('svg'),ns='http://www.w3.org/2000/svg';
@@ -283,6 +292,26 @@
     scene.art.classList.toggle('is-gliding',glide>.5);
     scene.art.classList.toggle('is-looping',!!f.pattern);paint(scene);
   }
+  const mouseHover=matchMedia('(hover:hover) and (pointer:fine)');
+  let pointer=null;
+  const trackPointer=event=>{pointer=mouseHover.matches&&innerWidth>760&&event.pointerType!=='touch'?{x:event.clientX,y:event.clientY}:null;};
+  addEventListener('pointermove',trackPointer,{passive:true});
+  addEventListener('pointerdown',trackPointer,{passive:true});
+  addEventListener('pointerout',event=>{if(!event.relatedTarget)pointer=null;},{passive:true});
+  addEventListener('blur',()=>{pointer=null;});
+  function revealColor(scene,delta){
+    let hit=false;
+    if(pointer&&mouseHover.matches&&innerWidth>760&&scene.art.classList.contains('is-visible')){
+      const r=scene.art.getBoundingClientRect();
+      hit=pointer.x>=r.left&&pointer.x<=r.right&&pointer.y>=r.top&&pointer.y<=r.bottom;
+    }
+    const amount=1-Math.exp(-Math.min(delta,50)/(hit?120:220));
+    scene.color=(scene.color||0)+((hit?1:0)-(scene.color||0))*amount;
+    if(scene.color<.001)scene.color=0;
+    scene.art.style.setProperty('--color-reveal',String(scene.color));
+    scene.art.classList.toggle('is-color-active',scene.color>.005);
+    if(scene.footer)scene.art.querySelector('filter[id$="footer-foreground"] feFuncA')?.setAttribute('slope',String(.34+.66*scene.color));
+  }
   function frame(time){
     const delta=previous?Math.min(time-previous,50):0;previous=time;
     const active=showScene();
@@ -294,6 +323,7 @@
         else if(!active.header&&active.outing>active.outingLimit)active.fadeOut=1400;
       }
     }
+    scenes.forEach(scene=>revealColor(scene,delta));
     raf=requestAnimationFrame(frame);
   }
   function update(){
