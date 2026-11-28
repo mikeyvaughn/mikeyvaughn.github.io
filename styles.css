@@ -54,7 +54,7 @@ html{font-size:112.5%}body{font-size:1rem}
 .community-art{width:100%;max-width:420px;height:auto;margin-top:46px}
 .campaign-photo{margin-bottom:28px;overflow:hidden}
 .campaign-photo img{aspect-ratio:1.6;object-fit:cover;object-position:50% 32%}
-.campaign:nth-child(2) .campaign-photo img{object-position:50% 26%}
+
 .interview-visual{margin-top:38px;max-width:490px}
 .interview-visual img{width:100%;aspect-ratio:1.45;object-fit:cover;object-position:50% 28%}
 .interview-visual figcaption{font-size:.75rem;line-height:1.6;margin-top:13px}
@@ -695,3 +695,7 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
 .campaign-note .campaign-note-copy p{max-width:none;line-height:1.8}
 .campaign-note-copy p+p{margin-top:18px}
 @media(max-width:760px){.campaign-note{grid-template-columns:1fr;row-gap:12px}.campaign-note-copy p+p{margin-top:16px}}
+
+/* Give the portrait room while preserving the paired landscape photo frames. */
+.campaign-photo-seema{background:#b8b7ae}
+.campaign-photo-seema img{width:80%;height:auto;aspect-ratio:1.28;object-fit:cover;object-position:50% 14%;margin-inline:auto}
