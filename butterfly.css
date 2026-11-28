@@ -25,3 +25,6 @@ body:has(.masthead.menu-open) .mfv-butterfly-surface{visibility:hidden}
 /* Footer butterfly occludes divider lines through its alpha silhouette, not a rectangle. */
 .footer .mfv-butterfly-surface{z-index:2}
 .footer .mfv-butterfly.is-visible{opacity:1}
+
+/* Navigation stays legible above the header butterfly’s S-shaped flight. */
+.header-band nav{position:relative;z-index:2}

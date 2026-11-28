@@ -40,10 +40,10 @@
   function bounds(scene){
     const right=Math.max(9,scene.width-scene.art.offsetWidth-8);
     // Both entrances and the whole flight stay in the requested right-hand area.
-    const requestedLeft=scene.width>760?(scene.header?scene.width*.72:scene.statement?scene.width*.6:8):8;
+    const requestedLeft=scene.width>760?(scene.header&&scene.navRoute?scene.navRoute.left:scene.statement?scene.width*.6:8):8;
     const radius=scene.art.offsetWidth*.48,cy=scene.art.offsetHeight*.525;
     const top=Math.max(6,Math.ceil(radius-cy)+6);
-    return{left:Math.min(right,Math.max(8,requestedLeft)),right,top,bottom:Math.max(top+1,(scene.zoneHeight||scene.height)-cy-radius-6)};
+    return{left:Math.min(right,Math.max(8,requestedLeft)),right:scene.header&&scene.navRoute?Math.min(right,scene.navRoute.right):right,top,bottom:Math.max(top+1,(scene.zoneHeight||scene.height)-cy-radius-6)};
   }
   function footprint(scene,p,padding=8,scale=1){
     const w=scene.art.offsetWidth,h=scene.art.offsetHeight;
@@ -58,6 +58,13 @@
   function measureContent(scene){
     const root=scene.section.getBoundingClientRect(),rects=[];
     const add=r=>{if(r.width>0&&r.height>0)rects.push({left:r.left-root.left,right:r.right-root.left,top:r.top-root.top,bottom:r.bottom-root.top});};
+    // The header crosses behind navigation labels; links remain above the decorative layer.
+    if(scene.header&&scene.width>760){
+      const nav=scene.section.querySelector('nav'),r=nav?.getBoundingClientRect();
+      scene.navRoute=r?{left:r.left-root.left-scene.art.offsetWidth*.5,right:r.right-root.left-scene.art.offsetWidth*.5}:null;
+      scene.obstacles=[];scene.safe=!!r;
+      const b=bounds(scene);scene.waypoints=[{x:b.left,y:(b.top+b.bottom)/2}];scene.smallWaypoints=[];return;
+    }
     const walker=document.createTreeWalker(scene.section,NodeFilter.SHOW_TEXT);let node;
     while((node=walker.nextNode())){
       if(!node.textContent.trim()||node.parentElement.closest('.mfv-butterfly-surface,script,style'))continue;
@@ -145,6 +152,7 @@
     // Reposition only while invisible, never in response to scrolling.
     scene.scale=1;scene.point=randomPoint(scene);scene.art.classList.remove('is-perched');
     nextFlight(scene);
+    if(scene.header&&scene.navRoute){const b=bounds(scene);scene.point={x:b.left,y:(b.top+b.bottom)/2};scene.flight.headerTime=0;scene.flight.headerPhase=Math.random()*.24-.12;}
     scene.bank=Math.atan2(scene.flight.vy,scene.flight.vx)*180/Math.PI+90;paint(scene);
   }
   function sizeScene(scene){
@@ -218,6 +226,17 @@
     const cycle=f.burst+f.coast,cycleTime=f.clock%cycle;
     const glide=smooth((cycleTime-f.burst)/180)*(1-smooth((cycleTime-cycle+180)/180));
     scene.phase+=delta/f.cadence*Math.PI*2*(1-glide);
+    if(scene.header&&scene.navRoute){
+      const b=bounds(scene),span=Math.max(1,b.right-b.left);
+      f.headerTime=(f.headerTime||0)+dt;
+      // A broad S across the tabs, with a soft turn at each end and a shallow vertical sweep.
+      const t=f.headerTime/(span/43)*Math.PI;
+      const u=(1-Math.cos(t))/2;
+      const amplitude=(b.bottom-b.top)*.43;
+      const next={x:b.left+span*u,y:(b.top+b.bottom)/2+Math.sin(u*Math.PI*2+(f.headerPhase||0))*amplitude};
+      f.vx=(next.x-scene.point.x)/Math.max(dt,.001);f.vy=(next.y-scene.point.y)/Math.max(dt,.001);
+      scene.point=next;f.turn=Math.sin(u*Math.PI*2)*.22;f.pattern=null;f.blocked=0;
+    }else{
     const current=Math.atan2(f.vy,f.vx),desired=current+f.turn*.75;
     const lookAhead=Math.max(32,Math.min(85,Math.hypot(f.vx,f.vy)*2.1));
     let steering=desired,best=-Infinity;
@@ -238,6 +257,7 @@
       // Slow and fade in a confined pocket rather than bounce off an invisible rail.
       f.vx*=.88;f.vy*=.88;f.blocked+=delta;
       if(f.blocked>350&&scene.fadeOut<=0)scene.fadeOut=1200;
+    }
     }
     const velocity=Math.hypot(f.vx,f.vy);
     if(velocity>1){
