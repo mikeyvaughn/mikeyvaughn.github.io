@@ -696,6 +696,6 @@ body:has(.masthead.menu-open) .back-to-top{visibility:hidden}
 .campaign-note-copy p+p{margin-top:18px}
 @media(max-width:760px){.campaign-note{grid-template-columns:1fr;row-gap:12px}.campaign-note-copy p+p{margin-top:16px}}
 
-/* Give the portrait room while preserving the paired landscape photo frames. */
-.campaign-photo-seema{background:#b8b7ae}
-.campaign-photo-seema img{width:80%;height:auto;aspect-ratio:1.28;object-fit:cover;object-position:50% 14%;margin-inline:auto}
+/* Full-width portraits with room around faces and matching campaign frames. */
+.campaign-photo img{aspect-ratio:1.28}
+.campaign-photo-seema img{width:100%;height:auto;object-fit:cover;object-position:50% 14%}
