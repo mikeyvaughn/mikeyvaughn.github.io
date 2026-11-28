@@ -52,3 +52,6 @@
 .about-documentary.hero-carousel [data-photo="about-medals"] img{object-fit:contain}
 .about-documentary .hero-carousel-caption{min-height:62px}
 .about-documentary [data-caption-meta]:empty{display:none}
+
+/* Keep the personal connection and constellation explanation easy to scan. */
+.about-story-copy p+p{margin-top:18px}
