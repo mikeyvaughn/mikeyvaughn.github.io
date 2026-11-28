@@ -12,12 +12,10 @@
 .about-prose .about-personal{border-top:1px solid var(--line);padding-top:20px;margin-top:26px}
 .about-prose .text-link{min-height:44px;padding-block:8px}
 .about-logo-story{background:var(--sage);padding-block:42px}
-.about-story-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:center}
+.about-story-layout{display:grid;grid-template-columns:minmax(0,1fr) 112px minmax(0,1.2fr);gap:32px;align-items:center}
 .about-story-layout h2{font-family:var(--serif);font-size:2.5rem;line-height:1.1;letter-spacing:-.025em;margin-top:14px}
-.about-story-heading{display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:24px;row-gap:12px;align-items:center;margin-top:0}
-.about-story-heading .eyebrow{grid-column:2;grid-row:1}
-.about-story-heading h2{grid-column:2;grid-row:2}
-.about-story-symbol{grid-column:1;grid-row:2;width:112px;height:auto;display:block}
+.about-story-heading{display:grid;gap:12px;align-items:start;margin-top:0}
+.about-story-symbol{width:112px;height:auto;display:block;justify-self:center}
 .about-story-heading h2{margin-top:0}
 .about-story-copy{max-width:58ch}
 .about-story-copy p{font-size:1rem;line-height:1.65}
@@ -36,7 +34,7 @@
  .about-logo-story{padding-block:32px}
  .about-story-layout{grid-template-columns:1fr;gap:22px}
  .about-story-layout h2{font-size:2rem;line-height:1.12;margin-top:12px}
- .about-story-heading{grid-template-columns:72px minmax(0,1fr);column-gap:18px;row-gap:10px;margin-top:0}
+ .about-story-heading{gap:10px;margin-top:0}
  .about-story-symbol{width:72px;height:auto}
  .about-story-heading h2{margin-top:0}
 }
@@ -58,6 +56,7 @@
 /* Keep the personal connection and constellation explanation easy to scan. */
 .about-story-copy p+p{margin-top:18px}
 
-/* A quiet closing line, separate from the explanatory body. */
-.about-story-copy p:last-child{font-family:var(--serif);font-size:1.15rem;line-height:1.4;color:var(--pine)}
-@media(max-width:380px){.about-story-heading{grid-template-columns:64px minmax(0,1fr);column-gap:14px}.about-story-symbol{width:64px}.about-story-heading h2{font-size:1.85rem}}
+/* The village line uses the same body type; paragraph spacing gives it separation. */
+@media(max-width:380px){.about-story-symbol{width:64px}.about-story-heading h2{font-size:1.85rem}}
+
+.about-story-copy .about-story-closing{font-weight:700}
